@@ -1,0 +1,118 @@
+import { createClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/supabase/service'
+import { NewContaAReceber, ContaAReceber } from '@/lib/schemas/ar'
+import { withAudit } from '@/lib/audit'
+import type { z } from 'zod'
+
+export type ListARParams = {
+  status?: 'previsto' | 'emitido' | 'recebido' | 'atrasado' | 'cancelado'
+  cliente_id?: string
+  vencimento_ate?: string
+  vencimento_de?: string
+}
+
+export async function listarAR(p: ListARParams = {}) {
+  const supabase = await createClient()
+  let q = supabase
+    .from('contas_a_receber')
+    .select('*, cliente:clientes(nome)')
+    .order('data_vencimento', { ascending: true })
+  if (p.status) q = q.eq('status', p.status)
+  if (p.cliente_id) q = q.eq('cliente_id', p.cliente_id)
+  if (p.vencimento_de) q = q.gte('data_vencimento', p.vencimento_de)
+  if (p.vencimento_ate) q = q.lte('data_vencimento', p.vencimento_ate)
+  const { data, error } = await q
+  if (error) throw new Error(`listarAR: ${error.message}`)
+  return data ?? []
+}
+
+export async function criarAR(input: z.input<typeof NewContaAReceber>) {
+  const parsed = NewContaAReceber.parse(input)
+  const supabase = await createClient()
+  const { data, error } = await supabase.from('contas_a_receber').insert(parsed).select().single()
+  if (error) throw new Error(`criarAR: ${error.message}`)
+  return data as ContaAReceber
+}
+
+/**
+ * Mark an AR as received. This is a sensitive mutation — wrapped in withAudit.
+ * Note: lancamento creation happens in Phase 2 (Despesas/Caixa). For now we just
+ * set status='recebido' and data_recebimento. lancamento_id stays null until Phase 4.
+ */
+export async function marcarRecebido(id: string, dataRecebimento: string, usuarioId: string) {
+  const supabase = await createClient()
+  const { data: before, error: bErr } = await supabase
+    .from('contas_a_receber').select('*').eq('id', id).single()
+  if (bErr || !before) throw new Error(`AR not found: ${bErr?.message ?? 'no row'}`)
+
+  return withAudit(
+    {
+      usuario_id: usuarioId,
+      acao: 'update',
+      tabela: 'contas_a_receber',
+      registro_id: id,
+      before: before as Record<string, unknown>,
+      after: { ...(before as Record<string, unknown>), status: 'recebido', data_recebimento: dataRecebimento },
+      motivo: 'marcar como recebido',
+    },
+    async () => {
+      const { data, error } = await supabase
+        .from('contas_a_receber')
+        .update({ status: 'recebido', data_recebimento: dataRecebimento })
+        .eq('id', id)
+        .select()
+        .single()
+      if (error) throw new Error(`marcarRecebido: ${error.message}`)
+      return data as ContaAReceber
+    },
+  )
+}
+
+export async function cancelarAR(id: string, motivo: string, usuarioId: string) {
+  const supabase = await createClient()
+  const { data: before, error: bErr } = await supabase
+    .from('contas_a_receber').select('*').eq('id', id).single()
+  if (bErr || !before) throw new Error(`AR not found`)
+
+  return withAudit(
+    {
+      usuario_id: usuarioId,
+      acao: 'update',
+      tabela: 'contas_a_receber',
+      registro_id: id,
+      before: before as Record<string, unknown>,
+      after: { ...(before as Record<string, unknown>), status: 'cancelado' },
+      motivo,
+    },
+    async () => {
+      const { data, error } = await supabase
+        .from('contas_a_receber').update({ status: 'cancelado' }).eq('id', id).select().single()
+      if (error) throw new Error(`cancelarAR: ${error.message}`)
+      return data as ContaAReceber
+    },
+  )
+}
+
+/**
+ * Service-role helper for the AR generation job. Inserts a batch of NewAR,
+ * skipping duplicates (relies on the unique indexes from migration 0010).
+ */
+export async function inserirARBatch(rows: z.input<typeof NewContaAReceber>[]) {
+  if (rows.length === 0) return { inserted: 0, skipped: 0 }
+  const parsed = rows.map((r) => NewContaAReceber.parse(r))
+  const admin = createServiceClient()
+  let inserted = 0
+  let skipped = 0
+  for (const row of parsed) {
+    const { error } = await admin.from('contas_a_receber').insert(row)
+    if (error) {
+      if (error.code === '23505') {
+        skipped++
+        continue
+      }
+      throw new Error(`inserirARBatch: ${error.message}`)
+    }
+    inserted++
+  }
+  return { inserted, skipped }
+}
