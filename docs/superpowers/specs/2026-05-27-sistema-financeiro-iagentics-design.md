@@ -96,6 +96,13 @@ src/
 db/
   migrations/                     # SQL versionado
   seeds/
+prompts/                          # prompts versionados (padrão anthropics/financial-services)
+  README.md
+  categorizacao/SKILL.md
+  reconciliacao/SKILL.md
+  commentary/SKILL.md
+  folha/SKILL.md
+  contratos/SKILL.md
 tests/
   unit/
   integration/
@@ -578,3 +585,80 @@ Qualidade:
 2. **Execução por phase** com TDD
 3. **Soft launch interno** (1 mês paralelo a planilha atual para validação)
 4. **Go-live** quando critérios de sucesso atingidos
+
+---
+
+## 13. Padrões Adotados de `anthropics/financial-services`
+
+O repositório de referência da Anthropic ([github.com/anthropics/financial-services](https://github.com/anthropics/financial-services)) contém ~10 agent plugins e ~8 vertical skill bundles para FSI. ~75% é institucional (IB, ER, PE, wealth) e não aplica. Os ~25% aplicáveis virariam pilares arquiteturais desta solução.
+
+### 13.1 Arquitetura de segurança LLM: read-only orchestrator / write-only leaf
+
+**Padrão (de `managed-agent-cookbooks/gl-reconciler/agent.yaml`):** chamadas Claude **NUNCA** executam writes diretamente. Toda chamada LLM é roteada por um wrapper que retorna apenas classificação/texto/JSON; escritas em Supabase só ocorrem em handlers server-side validados após review humano ou regra explícita.
+
+**Como aplicar:** módulo `src/lib/llm/` (introduzido na Fase 4) expõe `classify()`, `extract()`, `summarize()` — funções puras que retornam tipos Zod-validados. Não recebem cliente Supabase. Documentos não-confiáveis (extratos, NFs) nunca entram em agente com permissão de escrita.
+
+### 13.2 Taxonomia de classificação de bank breaks (de `fund-admin/skills/break-trace/SKILL.md`)
+
+Substitui categorias ad-hoc no matching Pluggy ↔ AP/AR (§6.2). Cada `lancamento` não-conciliado recebe uma das classes:
+- `matched` (valor + data + descrição batem)
+- `timing-break` (valor bate, data fora da janela)
+- `amount-break` (data bate, valor difere)
+- `mapping-issue` (credor/cliente conhecido mas categoria divergente)
+- `duplicate` (mesmo valor+descrição repetido <72h)
+- `bank-only` (existe em Pluggy, sem AR/AP correspondente)
+- `ledger-only` (AR/AP previsto sem entrada Pluggy correspondente)
+
+Score >0.8 → auto-resolve. Outras categorias → fila de revisão UI com a taxonomia exposta para o operador.
+
+### 13.3 Variance commentary (de `fund-admin/skills/variance-commentary/SKILL.md`)
+
+Dois usos:
+
+1. **Prompt template do categorizador (§5.7, §6.1):** padrão "explicar o driver, não restituir o percentual" + materiality threshold (max(5% da categoria, R$ 50)). Adaptado para PT-BR.
+2. **Dashboard executivo (§5.10):** widget "comentário mensal IA" — gera 3-5 sentenças sobre variações relevantes Forecast vs. realizado com explicação de driver. Limite de chamadas: 1 vez/mês após fechamento (não ad-hoc, evita ruído + custo).
+
+### 13.4 Roll-forward invariants (de `month-end-closer/skills/roll-forward/SKILL.md`)
+
+Fórmula: `final = inicial + adições + accruals - reversões - pagamentos ± reclassificações`.
+
+Vira invariantes de property tests (§9):
+- Folha: `inicial_provisao_13 + adicao_mes - pagamento = final_provisao_13`
+- AP: `Σ AP_emitidos_mes - Σ AP_pagos_mes = ΔAP_aberto`
+- Caixa: `saldo_inicial + entradas - saidas = saldo_final` por conta
+
+### 13.5 Accrual schedule (de `month-end-closer/skills/accrual-schedule/SKILL.md`)
+
+Pattern para Folha (§5.4):
+1. Base (salário/hora × horas)
+2. Período proporcional (PJ spot iniciado mid-month)
+3. Já contabilizado (APs anteriores do mesmo job)
+4. Delta = accrual deste mês
+
+Aplicação: `pj_spot` com `tipo_remuneracao = 'hora'` usa esse padrão para gerar AP mensal correto quando o job atravessa meses.
+
+### 13.6 Estrutura de prompts versionada (de `plugins/vertical-plugins/`)
+
+Adotar layout análogo: prompts em arquivos `.md` versionados, não strings hardcoded em código. Estrutura proposta:
+
+```
+prompts/
+  README.md                     # documenta convenção
+  categorizacao/
+    SKILL.md                    # prompt principal cascata
+    exemplos/                   # few-shot examples
+  reconciliacao/
+    SKILL.md                    # classificação de breaks
+  commentary/
+    SKILL.md                    # variance commentary mensal
+  folha/
+    SKILL.md                    # validação de cálculo de folha
+  contratos/
+    SKILL.md                    # extração de termos de contrato
+```
+
+Benefício: prompts auditáveis via `git diff`, sem drift, traduzidos para PT-BR, reutilizáveis entre módulos. Esta estrutura é criada na Fase 0 (skeleton) e preenchida nas fases respectivas.
+
+### 13.7 Managed Agents como expansão futura
+
+Se algum fluxo crescer (ex: fechamento mensal automatizado E2E), pode ser deployado como Managed Agent headless via `agent.yaml` (padrão dos cookbooks). Não é Fase 0-6; entra eventualmente como Fase 7+ se justificado.

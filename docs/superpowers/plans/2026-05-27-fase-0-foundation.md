@@ -1785,7 +1785,226 @@ git commit -m "docs: README with setup instructions"
 
 ---
 
-### Task 22: Verification & phase wrap-up
+### Task 22: Scaffold prompt library (padrão anthropics/financial-services)
+
+**Files:**
+- Create: `prompts/README.md`, `prompts/categorizacao/SKILL.md`, `prompts/reconciliacao/SKILL.md`, `prompts/commentary/SKILL.md`, `prompts/folha/SKILL.md`, `prompts/contratos/SKILL.md`
+
+**Context:** Inspired by `anthropics/financial-services` repo (vertical-plugins layout). Prompts live as versioned `.md` files, not hardcoded strings — auditable via `git diff`, no drift, reusable across modules. Each `SKILL.md` is a skeleton with frontmatter + section headers; bodies get filled in their respective phases (Phase 4 categorização/reconciliação, Phase 3 folha, Phase 5 commentary, Phase 1 contratos).
+
+- [ ] **Step 1: Write `prompts/README.md`**
+
+```markdown
+# Prompts — Biblioteca versionada
+
+Padrão adotado de [anthropics/financial-services](https://github.com/anthropics/financial-services/tree/main/plugins/vertical-plugins).
+
+## Convenção
+
+- Cada domínio tem uma pasta com um `SKILL.md` principal
+- `SKILL.md` começa com frontmatter YAML (`name`, `description`, `model`, `inputs`, `outputs`)
+- Corpo segue estrutura: Objetivo → Inputs → Procedimento → Outputs → Restrições → Exemplos
+- Prompts em **PT-BR** (público interno IAgentics)
+- Mudanças passam por code review como código
+
+## Domínios
+
+| Pasta | Usado por | Preenchido na fase |
+|---|---|---|
+| `categorizacao/` | módulo Categorizador (cascata regras→histórico→LLM) | Fase 4 |
+| `reconciliacao/` | classificação de breaks Pluggy ↔ AP/AR | Fase 4 |
+| `commentary/` | narrativa mensal Forecast vs. realizado | Fase 5 |
+| `folha/` | validação de cálculo de corrida de folha | Fase 3 |
+| `contratos/` | extração estruturada de termos de contrato | Fase 1 |
+
+## Segurança LLM
+
+Toda chamada Claude passa pelo wrapper em `src/lib/llm/` (introduzido na Fase 4). O wrapper é **read-only orchestrator / write-only leaf**: o LLM retorna apenas classificação/texto/JSON; escritas em Supabase ocorrem só em handlers server-side validados. Documentos não-confiáveis (extratos, NFs) nunca entram em contexto com permissão de escrita.
+```
+
+- [ ] **Step 2: Skeleton `prompts/categorizacao/SKILL.md`**
+
+```markdown
+---
+name: categorizacao-cascata
+description: Classifica lançamento financeiro em uma categoria do plano de contas após regras e histórico falharem
+model: claude-haiku-4-5
+inputs:
+  - descricao (string)
+  - valor (number)
+  - categorias_disponiveis (array)
+  - exemplos_recentes (array, opcional)
+outputs:
+  - categoria_id (uuid)
+  - confianca (number 0..1)
+  - justificativa (string ≤ 200 chars)
+---
+
+# Objetivo
+
+(A ser preenchido na Fase 4. Pattern de referência: `fund-admin/skills/variance-commentary/SKILL.md` — focar em driver, não em parafrasear descrição.)
+
+# Inputs
+
+# Procedimento
+
+# Outputs
+
+# Restrições
+
+- Nunca inventar categoria fora da lista fornecida
+- Se incerto (confianca ≤ 0.7), preferir devolver baixa confiança a chutar
+- Em PT-BR
+
+# Exemplos
+
+(Few-shot a ser adicionado na Fase 4.)
+```
+
+- [ ] **Step 3: Skeleton `prompts/reconciliacao/SKILL.md`**
+
+```markdown
+---
+name: reconciliacao-break-classifier
+description: Classifica lançamento Pluggy não conciliado em uma das categorias de break
+model: claude-haiku-4-5
+inputs:
+  - lancamento (object)
+  - candidatos_ap_ar (array)
+outputs:
+  - classificacao (enum)
+  - melhor_match_id (uuid | null)
+  - score (number 0..1)
+  - explicacao (string)
+---
+
+# Objetivo
+
+(A ser preenchido na Fase 4. Pattern de referência: `fund-admin/skills/break-trace/SKILL.md`. Taxonomia em §13.2 do spec: matched | timing-break | amount-break | mapping-issue | duplicate | bank-only | ledger-only.)
+
+# Inputs
+
+# Procedimento
+
+# Outputs
+
+# Restrições
+
+# Exemplos
+```
+
+- [ ] **Step 4: Skeleton `prompts/commentary/SKILL.md`**
+
+```markdown
+---
+name: commentary-mensal
+description: Gera comentário executivo 3-5 sentenças sobre variações Forecast vs. realizado
+model: claude-haiku-4-5
+inputs:
+  - mes_ref (date)
+  - linhas_variancia (array)
+  - thresholds (object)
+outputs:
+  - resumo (string, 3-5 sentenças)
+  - destaques (array de objetos {linha, driver, magnitude})
+---
+
+# Objetivo
+
+(A ser preenchido na Fase 5. Pattern de referência: `fund-admin/skills/variance-commentary/SKILL.md`. Materialidade: max(5% da categoria, R$ 50). Explicar driver, não restituir percentual.)
+
+# Inputs
+
+# Procedimento
+
+# Outputs
+
+# Restrições
+
+- Limite 1 chamada/mês (após fechamento) — não ad-hoc
+- Sempre em PT-BR
+- Nunca inventar números — usar apenas dados de entrada
+
+# Exemplos
+```
+
+- [ ] **Step 5: Skeleton `prompts/folha/SKILL.md`**
+
+```markdown
+---
+name: folha-validador
+description: Sanity-check em corrida de folha — flag inconsistências em encargos/provisões antes do fechamento
+model: claude-haiku-4-5
+inputs:
+  - itens_folha (array)
+  - mes_anterior (array, opcional)
+outputs:
+  - flags (array de {item_id, tipo, descricao, severidade})
+---
+
+# Objetivo
+
+(A ser preenchido na Fase 3. Pattern de referência: `month-end-closer/skills/accrual-schedule/SKILL.md` — accrual = base × periodo - já_contabilizado.)
+
+# Inputs
+
+# Procedimento
+
+# Outputs
+
+# Restrições
+
+- LLM **nunca** modifica itens_folha — apenas reporta flags
+- Severidades: info | warning | critical
+
+# Exemplos
+```
+
+- [ ] **Step 6: Skeleton `prompts/contratos/SKILL.md`**
+
+```markdown
+---
+name: contratos-extracao
+description: Extrai termos estruturados de PDF/texto de contrato (AaaS ou projeto)
+model: claude-haiku-4-5
+inputs:
+  - texto_contrato (string)
+  - tipo_esperado (enum: aaas | projeto)
+outputs:
+  - cliente (object)
+  - termos (object — tipo-dependente)
+  - milestones (array, se projeto)
+  - campos_faltantes (array)
+---
+
+# Objetivo
+
+(A ser preenchido na Fase 1. Pattern de referência: `operations/skills/kyc-doc-parse/SKILL.md` — null para campos ausentes, lista explícita de gaps.)
+
+# Inputs
+
+# Procedimento
+
+# Outputs
+
+# Restrições
+
+- Nunca inferir CPF/CNPJ — só extrair literal
+- Campos faltantes vão para `campos_faltantes`, não para guesses
+
+# Exemplos
+```
+
+- [ ] **Step 7: Commit**
+
+```bash
+git add prompts/
+git commit -m "feat(prompts): scaffold versioned prompt library (anthropics/financial-services pattern)"
+```
+
+---
+
+### Task 23: Verification & phase wrap-up
 
 - [ ] **Step 1: Full test suite locally**
 
