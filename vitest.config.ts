@@ -1,7 +1,10 @@
 import { defineConfig } from 'vitest/config'
 import path from 'node:path'
 
-const alias = { '@': path.resolve(__dirname, './src') }
+const alias = {
+  '@': path.resolve(__dirname, './src'),
+  'server-only': path.resolve(__dirname, './tests/__mocks__/server-only.ts'),
+}
 
 export default defineConfig({
   resolve: { alias },
