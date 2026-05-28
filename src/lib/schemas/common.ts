@@ -11,11 +11,15 @@ export const Money = z
 
 const digits = (s: string) => s.replace(/\D/g, '')
 
+// NOTE: validates format/length only — does NOT verify MOD-11 checksum.
+// Add full validation in Phase 1 when capturing client/funcionario CPF/CNPJ.
 export const Cnpj = z
   .string()
   .transform(digits)
   .refine((s) => s.length === 14, { message: 'cnpj must have 14 digits' })
 
+// NOTE: validates format/length only — does NOT verify MOD-11 checksum.
+// Add full validation in Phase 1 when capturing client/funcionario CPF/CNPJ.
 export const Cpf = z
   .string()
   .transform(digits)

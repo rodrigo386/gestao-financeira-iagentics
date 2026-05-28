@@ -17,24 +17,39 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL('/login?error=exchange_failed', request.url))
   }
 
-  // ensure usuarios row exists (first-login bootstrap)
+  // Bootstrap usuarios row. The role assignment uses a single SQL statement to
+  // avoid a TOCTOU race when two new users sign in concurrently: the first INSERT
+  // that wins the unique constraint on (role='admin') gets admin; the others
+  // fall back to leitura via the partial index conflict.
+  //
+  // The partial unique index `usuarios_admin_singleton` (see migration 0005) enforces
+  // "at most one admin exists at any time during bootstrap". If a non-admin user later
+  // needs to be promoted, an admin explicitly updates the role.
   const admin = createServiceClient()
-  await admin.from('usuarios').upsert(
-    {
+  const userName = data.user.email?.split('@')[0] ?? 'Usuário'
+
+  // First try as admin; if a partial-unique-violation occurs (another admin exists),
+  // fall back to leitura.
+  const { error: adminInsertErr } = await admin.from('usuarios').insert({
+    id: data.user.id,
+    nome: userName,
+    role: 'admin',
+  })
+
+  if (adminInsertErr) {
+    // Either the user already exists (rerun) or another admin already exists.
+    // In both cases, ensure a row exists with leitura as default.
+    await admin.from('usuarios').insert({
       id: data.user.id,
-      nome: data.user.email?.split('@')[0] ?? 'Usuário',
-      role: await firstUserShouldBeAdmin(admin) ? 'admin' : 'leitura',
-    },
-    { onConflict: 'id', ignoreDuplicates: true },
-  )
+      nome: userName,
+      role: 'leitura',
+    }).then(({ error: leituraErr }) => {
+      // If this also fails, the row already exists from a prior login — ignore.
+      if (leituraErr && !leituraErr.message.toLowerCase().includes('duplicate')) {
+        console.error('usuarios bootstrap unexpected error:', leituraErr)
+      }
+    })
+  }
 
   return NextResponse.redirect(new URL(next, request.url))
-}
-
-async function firstUserShouldBeAdmin(admin: ReturnType<typeof createServiceClient>) {
-  const { count } = await admin
-    .from('usuarios')
-    .select('id', { count: 'exact', head: true })
-    .eq('role', 'admin')
-  return (count ?? 0) === 0
 }
