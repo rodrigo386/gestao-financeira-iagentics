@@ -11,6 +11,8 @@ const NAV = [
   { href: '/contas-pagar',      label: 'Contas a Pagar' },
   { href: '/folha',             label: 'Folha de Pagamento' },
   { href: '/fluxo-caixa',       label: 'Fluxo de Caixa' },
+  { href: '/pendencias',        label: 'Pendências' },
+  { href: '/conciliacao',       label: 'Conciliação' },
   { href: '/forecast',          label: 'Forecast' },
   { href: '/relatorios',        label: 'Relatórios' },
   { href: '/config',            label: 'Configurações' },
