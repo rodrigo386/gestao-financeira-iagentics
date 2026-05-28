@@ -1,0 +1,59 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  lint-typecheck-unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+      - run: npm ci
+      - run: npm run lint
+      - run: npx tsc --noEmit
+      - run: npm run test:unit
+
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+      - uses: supabase/setup-cli@v1
+        with: { version: latest }
+      - run: supabase start
+      - run: npm ci
+      - name: Export service role key
+        run: |
+          KEY=$(supabase status -o env | grep SERVICE_ROLE_KEY | cut -d= -f2- | tr -d '"')
+          echo "SUPABASE_SERVICE_ROLE_KEY=$KEY" >> $GITHUB_ENV
+      - run: npm run test:int
+      - if: always()
+        run: supabase stop --no-backup
+
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+      - uses: supabase/setup-cli@v1
+        with: { version: latest }
+      - run: supabase start
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Write env
+        run: |
+          echo "NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321" >> .env.local
+          ANON=$(supabase status -o env | grep -E 'ANON_KEY' | cut -d= -f2- | tr -d '"')
+          SVC=$(supabase status -o env | grep SERVICE_ROLE_KEY | cut -d= -f2- | tr -d '"')
+          echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=$ANON" >> .env.local
+          echo "SUPABASE_SERVICE_ROLE_KEY=$SVC" >> .env.local
+          echo "NEXT_PUBLIC_APP_URL=http://localhost:3000" >> .env.local
+      - run: npm run test:e2e
+      - if: always()
+        run: supabase stop --no-backup
