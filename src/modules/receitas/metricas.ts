@@ -65,7 +65,10 @@ function isAtivoNaData(c: Contrato, refDate: string): boolean {
 }
 
 function addMonths(dateStr: string, months: number): string {
-  const [y, m, d] = dateStr.split('-').map(Number)
+  const parts = dateStr.split('-').map(Number)
+  const y = parts[0]!
+  const m = parts[1]!
+  const d = parts[2]!
   const date = new Date(Date.UTC(y, m - 1 + months, d))
   return date.toISOString().slice(0, 10)
 }

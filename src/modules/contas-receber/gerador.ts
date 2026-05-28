@@ -24,7 +24,7 @@ export function gerarARDoContrato(c: Contrato, refMonthStart: string): NewContaA
     origem: 'contrato',
     origem_id: c.id,
     valor,
-    moeda: c.moeda,
+    moeda: c.moeda as 'BRL' | 'USD' | 'EUR',
     data_emissao: refMonthStart,
     data_vencimento: dueDate,
     status: 'previsto',
@@ -58,18 +58,25 @@ export function gerarARDoMilestone(
 }
 
 function applyDiaCobranca(monthStart: string, dia: number): string {
-  const [y, m] = monthStart.split('-').map(Number)
+  const parts = monthStart.split('-').map(Number)
+  const y = parts[0]!
+  const m = parts[1]!
   return `${y}-${String(m).padStart(2, '0')}-${String(dia).padStart(2, '0')}`
 }
 
 function lastDayOfMonth(monthStart: string): string {
-  const [y, m] = monthStart.split('-').map(Number)
+  const parts = monthStart.split('-').map(Number)
+  const y = parts[0]!
+  const m = parts[1]!
   const last = new Date(Date.UTC(y, m, 0)).getUTCDate()
   return `${y}-${String(m).padStart(2, '0')}-${String(last).padStart(2, '0')}`
 }
 
 function addDays(dateStr: string, days: number): string {
-  const [y, m, d] = dateStr.split('-').map(Number)
+  const parts = dateStr.split('-').map(Number)
+  const y = parts[0]!
+  const m = parts[1]!
+  const d = parts[2]!
   const dt = new Date(Date.UTC(y, m - 1, d + days))
   return dt.toISOString().slice(0, 10)
 }
