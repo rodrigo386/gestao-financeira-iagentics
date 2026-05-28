@@ -1,15 +1,19 @@
 import { defineConfig } from 'vitest/config'
 import path from 'node:path'
 
+const alias = { '@': path.resolve(__dirname, './src') }
+
 export default defineConfig({
-  resolve: {
-    alias: { '@': path.resolve(__dirname, './src') },
-  },
+  resolve: { alias },
   test: {
     environment: 'node',
     projects: [
-      { test: { include: ['tests/unit/**/*.test.ts'], name: 'unit' } },
       {
+        resolve: { alias },
+        test: { include: ['tests/unit/**/*.test.ts'], name: 'unit' },
+      },
+      {
+        resolve: { alias },
         test: {
           include: ['tests/integration/**/*.test.ts'],
           name: 'integration',
