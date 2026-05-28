@@ -219,6 +219,22 @@ export async function fecharFolha(folhaId: string, usuarioId: string, cats: APCa
 
       await inserirAPBatch(allAPs)
 
+      // Generate holerite PDFs for each item (best-effort — failure does not block close)
+      const { data: orgRow } = await supabase.from('organizacao').select('nome').limit(1).single()
+      const orgNome = (orgRow?.nome as string) ?? 'IAgentics'
+
+      for (const item of itens ?? []) {
+        const func = (funcionarios as Funcionario[]).find((f) => f.id === item.funcionario_id)
+        if (!func) continue
+        try {
+          const { gerarHoleritePDF, uploadHolerite } = await import('@/modules/folha/holerite')
+          const pdfBytes = await gerarHoleritePDF(item as ItemFolha, func, folha.mes_ref, orgNome)
+          await uploadHolerite(item.id, pdfBytes)
+        } catch (pdfErr) {
+          console.error(`fecharFolha: holerite generation failed for item ${item.id}:`, pdfErr)
+        }
+      }
+
       // Close folha
       const { data, error } = await supabase
         .from('folha')
