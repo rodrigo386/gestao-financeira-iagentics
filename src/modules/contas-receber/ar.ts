@@ -35,15 +35,19 @@ export async function criarAR(input: z.input<typeof NewContaAReceber>) {
 }
 
 /**
- * Mark an AR as received. This is a sensitive mutation — wrapped in withAudit.
- * Note: lancamento creation happens in Phase 2 (Despesas/Caixa). For now we just
- * set status='recebido' and data_recebimento. lancamento_id stays null until Phase 4.
+ * Mark an AR as received. Atomically creates a lancamento entrada and links it via lancamento_id.
  */
-export async function marcarRecebido(id: string, dataRecebimento: string, usuarioId: string) {
+export async function marcarRecebido(
+  id: string,
+  dataRecebimento: string,
+  contaId: string,
+  categoriaReceitaId: string | undefined,
+  usuarioId: string,
+) {
   const supabase = await createClient()
   const { data: before, error: bErr } = await supabase
     .from('contas_a_receber').select('*').eq('id', id).single()
-  if (bErr || !before) throw new Error(`AR not found: ${bErr?.message ?? 'no row'}`)
+  if (bErr || !before) throw new Error(`AR not found`)
 
   return withAudit(
     {
@@ -56,14 +60,28 @@ export async function marcarRecebido(id: string, dataRecebimento: string, usuari
       motivo: 'marcar como recebido',
     },
     async () => {
+      // Atomically: create lancamento → update AR with lancamento_id
+      const { buildLancamentoFromAR, criarLancamento } = await import('@/modules/despesas/lancamentos')
+      const lancamentoInput = buildLancamentoFromAR(
+        before as never,
+        dataRecebimento,
+        contaId,
+        categoriaReceitaId,
+      )
+      const lancamento = await criarLancamento(lancamentoInput)
+
       const { data, error } = await supabase
         .from('contas_a_receber')
-        .update({ status: 'recebido', data_recebimento: dataRecebimento })
+        .update({
+          status: 'recebido',
+          data_recebimento: dataRecebimento,
+          lancamento_id: lancamento.id,
+        })
         .eq('id', id)
         .select()
         .single()
       if (error) throw new Error(`marcarRecebido: ${error.message}`)
-      return data as ContaAReceber
+      return data
     },
   )
 }
