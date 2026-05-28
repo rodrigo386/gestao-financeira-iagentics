@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 export default async function FluxoCaixaPage() {
   const supabase = await createClient()
 
-  const noventa = new Date(Date.now() - 90 * 86400_000).toISOString().slice(0, 10)
+  const noventaDate = new Date(); noventaDate.setDate(noventaDate.getDate() - 90)
+  const noventa = noventaDate.toISOString().slice(0, 10)
 
   const [{ data: contas }, { data: lancs }] = await Promise.all([
     supabase

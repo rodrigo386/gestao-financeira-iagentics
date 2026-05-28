@@ -11,7 +11,8 @@ export default async function DespesasPage() {
   const inicioMesStr = inicioMes.toISOString().slice(0, 10)
 
   const hoje = new Date().toISOString().slice(0, 10)
-  const em30 = new Date(Date.now() + 30 * 86400_000).toISOString().slice(0, 10)
+  const em30Date = new Date(); em30Date.setDate(em30Date.getDate() + 30)
+  const em30 = em30Date.toISOString().slice(0, 10)
 
   const [
     { data: saidasMes },
