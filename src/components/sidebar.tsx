@@ -14,11 +14,12 @@ const NAV = [
   { href: '/pendencias',        label: 'Pendências' },
   { href: '/conciliacao',       label: 'Conciliação' },
   { href: '/forecast',          label: 'Forecast' },
+  { href: '/alertas',           label: 'Alertas' },
   { href: '/relatorios',        label: 'Relatórios' },
   { href: '/config',            label: 'Configurações' },
 ]
 
-export function Sidebar() {
+export function Sidebar({ alertasUnread = 0 }: { alertasUnread?: number }) {
   const pathname = usePathname()
   return (
     <aside className="w-64 border-r bg-neutral-50 dark:bg-neutral-950 min-h-screen p-4">
@@ -31,13 +32,18 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={
-                'px-3 py-2 rounded-md text-sm transition-colors ' +
+                'px-3 py-2 rounded-md text-sm transition-colors flex items-center ' +
                 (active
                   ? 'bg-neutral-200 dark:bg-neutral-800 font-medium'
                   : 'hover:bg-neutral-100 dark:hover:bg-neutral-900')
               }
             >
               {item.label}
+              {item.href === '/alertas' && alertasUnread > 0 ? (
+                <span className="ml-2 inline-block min-w-[20px] text-center bg-red-600 text-white text-xs rounded-full px-1.5 py-0.5">
+                  {alertasUnread > 99 ? '99+' : alertasUnread}
+                </span>
+              ) : null}
             </Link>
           )
         })}

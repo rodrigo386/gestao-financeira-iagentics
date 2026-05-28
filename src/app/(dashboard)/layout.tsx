@@ -7,9 +7,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  const { count: alertasUnread } = await supabase
+    .from('alertas').select('id', { count: 'exact', head: true }).eq('lido', false)
+
   return (
     <div className="flex min-h-screen">
-      <Sidebar />
+      <Sidebar alertasUnread={alertasUnread ?? 0} />
       <main className="flex-1 p-8">{children}</main>
     </div>
   )
