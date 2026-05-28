@@ -1,0 +1,3 @@
+-- Seed data for local development
+-- This file is loaded automatically on `supabase db reset`
+-- Add your seed SQL statements here
