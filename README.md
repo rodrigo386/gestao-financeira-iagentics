@@ -65,6 +65,6 @@ npm run test:e2e           # playwright (precisa supabase start)
 | 1 ✅ | Receitas + Contas a Receber |
 | 2 ✅ | Despesas + Contas a Pagar |
 | 3 ✅ | Folha de Pagamento (CLT + PJ Spot) |
-| 4 | Bancos (Pluggy) + Categorização (regras + LLM) |
+| 4 ✅ | Bancos (Pluggy) + Categorização |
 | 5 | Forecast + Alertas |
 | 6 | Dashboard Executivo |
