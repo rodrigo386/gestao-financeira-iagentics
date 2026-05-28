@@ -20,6 +20,7 @@ export default defineConfig({
           setupFiles: ['tests/integration/setup.ts'],
           hookTimeout: 120000,
           testTimeout: 30000,
+          fileParallelism: false,
         },
       },
     ],
