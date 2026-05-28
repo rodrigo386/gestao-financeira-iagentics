@@ -14,6 +14,8 @@ function admin() {
 describe('contract generates AR pipeline', () => {
   let db: ReturnType<typeof admin>
   let clienteId: string
+  let contaId: string
+  let categoriaId: string
 
   beforeEach(async () => {
     db = admin()
@@ -23,6 +25,20 @@ describe('contract generates AR pipeline', () => {
       .select()
       .single()
     clienteId = c!.id
+
+    // Create a bank account for lancamentos
+    const { data: cb } = await db.from('contas_bancarias')
+      .insert({ banco: `Test-${Date.now()}`, tipo: 'cc', saldo_atual: 50000 })
+      .select()
+      .single()
+    contaId = cb!.id
+
+    // Get a receita category
+    const { data: cat } = await db.from('categorias')
+      .select('id')
+      .eq('nome', 'Receita Recorrente (AaaS)')
+      .single()
+    categoriaId = cat!.id
   })
 
   it('creates AR from active contract for the current month', async () => {
@@ -48,10 +64,24 @@ describe('contract generates AR pipeline', () => {
     expect(arErr).toBeNull()
     expect(ar?.status).toBe('previsto')
 
-    // 4. Mark as received
+    // 4. Create lancamento linked to AR (required by ar_recebido_requer_lancamento constraint)
+    const { data: lancamento } = await db.from('lancamentos').insert({
+      data: '2026-05-12',
+      valor: 1000,
+      conta_id: contaId,
+      tipo: 'entrada',
+      categoria_id: categoriaId,
+      descricao: 'AaaS Pro',
+      origem: 'ar',
+      origem_id: ar!.id,
+      cliente_id: clienteId,
+    }).select().single()
+    expect(lancamento).toBeTruthy()
+
+    // 5. Mark as received with lancamento_id
     const { data: updated, error: updErr } = await db
       .from('contas_a_receber')
-      .update({ status: 'recebido', data_recebimento: '2026-05-12' })
+      .update({ status: 'recebido', data_recebimento: '2026-05-12', lancamento_id: lancamento!.id })
       .eq('id', ar!.id)
       .select()
       .single()
