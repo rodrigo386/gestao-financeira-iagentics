@@ -62,8 +62,8 @@ export default async function CorridasPage({
   const supabase = await createClient()
   const folhaIds = folhas.map((f) => f.id)
 
-  let itemCountsMap: Record<string, number> = {}
-  let totalBrutoMap: Record<string, number> = {}
+  const itemCountsMap: Record<string, number> = {}
+  const totalBrutoMap: Record<string, number> = {}
 
   if (folhaIds.length > 0) {
     const { data: itemsRaw } = await supabase
