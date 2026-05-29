@@ -1,6 +1,7 @@
 import 'server-only'
 import type Anthropic from '@anthropic-ai/sdk'
 import { createServiceClient } from '@/lib/supabase/service'
+import { withAudit } from '@/lib/audit'
 import { ProposedActionSchema, type ProposedAction, type ResultadoAcao } from './types'
 import { recomputarProjecoes } from '@/modules/forecast/cenarios'
 import { fecharMes } from '@/modules/metricas/fechamento'
@@ -61,7 +62,7 @@ export function parseProposedAction(toolName: string, input: unknown): ProposedA
   return ProposedActionSchema.parse({ tipo, ...(input as object) })
 }
 
-/** Write-leaf: executa uma ação confirmada. Re-checa role para ações sensíveis. */
+/** Write-leaf: executa uma ação confirmada. Re-checa role para ações sensíveis. Audita tudo. */
 export async function executarAcao(
   acao: ProposedAction,
   usuario: { id: string; role: string },
@@ -71,37 +72,87 @@ export async function executarAcao(
     case 'salvar_cenario': {
       const { data: existente } = await admin
         .from('forecast_cenarios').select('id').eq('nome', acao.nome).maybeSingle()
-      let id: string
-      if (existente) {
-        const { error } = await admin
-          .from('forecast_cenarios').update({ drivers_json: acao.drivers }).eq('id', existente.id)
-        if (error) throw new Error(`salvar_cenario update: ${error.message}`)
-        id = existente.id
-      } else {
-        const { data: novo, error } = await admin
-          .from('forecast_cenarios').insert({ nome: acao.nome, drivers_json: acao.drivers, ativo: true }).select('id').single()
-        if (error) throw new Error(`salvar_cenario: ${error.message}`)
-        id = novo!.id
-      }
-      await recomputarProjecoes(id)
-      return { ok: true, detalhe: `Cenário "${acao.nome}" salvo e projeções recalculadas.` }
+      const id = existente?.id ?? crypto.randomUUID()
+      return withAudit(
+        {
+          usuario_id: usuario.id,
+          acao: existente ? 'update' : 'insert',
+          tabela: 'forecast_cenarios',
+          registro_id: id,
+          before: null,
+          after: { nome: acao.nome, drivers_json: acao.drivers },
+          motivo: 'copiloto: salvar cenário',
+        },
+        async () => {
+          if (existente) {
+            const { error } = await admin.from('forecast_cenarios').update({ drivers_json: acao.drivers }).eq('id', id)
+            if (error) throw new Error(`salvar_cenario update: ${error.message}`)
+          } else {
+            const { error } = await admin.from('forecast_cenarios').insert({ id, nome: acao.nome, drivers_json: acao.drivers, ativo: true })
+            if (error) throw new Error(`salvar_cenario: ${error.message}`)
+          }
+          await recomputarProjecoes(id)
+          return { ok: true, detalhe: `Cenário "${acao.nome}" salvo e projeções recalculadas.` }
+        },
+      )
     }
     case 'marcar_alertas_lidos': {
-      const { error } = await admin
-        .from('alertas').update({ lido: true, lido_em: new Date().toISOString(), lido_por: usuario.id }).in('id', acao.ids)
-      if (error) throw new Error(`marcar_alertas_lidos: ${error.message}`)
-      return { ok: true, detalhe: `${acao.ids.length} alerta(s) marcado(s) como lido(s).` }
+      return withAudit(
+        {
+          usuario_id: usuario.id,
+          acao: 'update',
+          tabela: 'alertas',
+          registro_id: acao.ids[0]!,
+          before: null,
+          after: { lido: true },
+          motivo: 'copiloto: marcar alertas lidos',
+          contexto: { ids: acao.ids },
+        },
+        async () => {
+          const { error } = await admin
+            .from('alertas').update({ lido: true, lido_em: new Date().toISOString(), lido_por: usuario.id }).in('id', acao.ids)
+          if (error) throw new Error(`marcar_alertas_lidos: ${error.message}`)
+          return { ok: true, detalhe: `${acao.ids.length} alerta(s) marcado(s) como lido(s).` }
+        },
+      )
     }
     case 'fechar_mes': {
       if (usuario.role !== 'admin') throw new Error('apenas admin pode fechar o mês')
-      await fecharMes(acao.mes_ref, usuario.id)
-      return { ok: true, detalhe: `Mês ${acao.mes_ref} fechado.` }
+      return withAudit(
+        {
+          usuario_id: usuario.id,
+          acao: 'custom',
+          tabela: 'metricas_mensais',
+          registro_id: acao.mes_ref,
+          before: null,
+          after: { mes_ref: acao.mes_ref },
+          motivo: 'copiloto: fechar mês',
+        },
+        async () => {
+          await fecharMes(acao.mes_ref, usuario.id)
+          return { ok: true, detalhe: `Mês ${acao.mes_ref} fechado.` }
+        },
+      )
     }
     case 'criar_regra': {
-      const { error } = await admin
-        .from('regras_categorizacao').insert({ pattern: acao.padrao, categoria_id: acao.categoria_id, pattern_tipo: 'contains', campo: 'descricao', origem: 'manual' })
-      if (error) throw new Error(`criar_regra: ${error.message}`)
-      return { ok: true, detalhe: `Regra "${acao.padrao}" criada.` }
+      const id = crypto.randomUUID()
+      return withAudit(
+        {
+          usuario_id: usuario.id,
+          acao: 'insert',
+          tabela: 'regras_categorizacao',
+          registro_id: id,
+          before: null,
+          after: { pattern: acao.padrao, categoria_id: acao.categoria_id },
+          motivo: 'copiloto: criar regra',
+        },
+        async () => {
+          const { error } = await admin
+            .from('regras_categorizacao').insert({ id, pattern: acao.padrao, categoria_id: acao.categoria_id, pattern_tipo: 'contains', campo: 'descricao', origem: 'manual' })
+          if (error) throw new Error(`criar_regra: ${error.message}`)
+          return { ok: true, detalhe: `Regra "${acao.padrao}" criada.` }
+        },
+      )
     }
   }
 }

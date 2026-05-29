@@ -1,5 +1,7 @@
 -- Read-only role for the copiloto SQL sandbox. The role's GRANTs are the real
 -- privilege barrier; transaction read-only + statement_timeout are defense-in-depth.
+-- NOTE: 'copiloto_ro_dev' is a LOCAL dev password. In production, rotate it
+-- (ALTER ROLE copiloto_ro WITH PASSWORD ...) and set COPILOTO_DATABASE_URL accordingly.
 do $$
 begin
   if not exists (select from pg_roles where rolname = 'copiloto_ro') then

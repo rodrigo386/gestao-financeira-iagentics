@@ -18,6 +18,11 @@ export async function POST(request: NextRequest) {
   const historico = (body.historico ?? []).slice(-20) // limita o contexto
   if (historico.length === 0) return NextResponse.json({ error: 'histórico vazio' }, { status: 400 })
 
-  const resposta = await responder(historico)
-  return NextResponse.json(resposta)
+  try {
+    const resposta = await responder(historico)
+    return NextResponse.json(resposta)
+  } catch (e) {
+    console.error('copiloto error:', e)
+    return NextResponse.json({ error: 'erro ao processar a solicitação' }, { status: 500 })
+  }
 }
