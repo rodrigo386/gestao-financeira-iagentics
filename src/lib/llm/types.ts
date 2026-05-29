@@ -20,3 +20,16 @@ export const BreakClassification = z.object({
 })
 
 export type BreakClassification = z.infer<typeof BreakClassification>
+
+export const CommentaryResult = z.object({
+  resumo: z.string().min(1).max(2000),
+  destaques: z.array(
+    z.object({
+      linha: z.string(),
+      driver: z.string(),
+      magnitude: z.string(),
+    }),
+  ),
+})
+
+export type CommentaryResult = z.infer<typeof CommentaryResult>

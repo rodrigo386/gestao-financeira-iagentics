@@ -1,6 +1,6 @@
 import 'server-only'
 import Anthropic from '@anthropic-ai/sdk'
-import { CategoriaSuggestion, BreakClassification } from './types'
+import { CategoriaSuggestion, BreakClassification, CommentaryResult } from './types'
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 
@@ -35,6 +35,19 @@ export async function classifyBreak(input: ClassifyBreakInput): Promise<BreakCla
     return mockClassifyBreak(input)
   }
   return realClassifyBreak(input)
+}
+
+type CommentaryInput = {
+  mes_ref: string
+  linhas: { linha: string; atual: number; anterior: number; delta: number; delta_pct: number | null }[]
+  thresholds: { pct: number; abs: number }
+}
+
+export async function gerarCommentaryMensal(input: CommentaryInput): Promise<CommentaryResult> {
+  if (process.env.LLM_MODE !== 'real') {
+    return mockCommentary(input)
+  }
+  return realCommentary(input)
 }
 
 // ===== mock =====
@@ -93,6 +106,23 @@ function mockClassifyBreak(input: ClassifyBreakInput): BreakClassification {
   }
 }
 
+function mockCommentary(input: CommentaryInput): CommentaryResult {
+  const destaques = input.linhas.map((l) => {
+    const dir = l.delta >= 0 ? 'aumento' : 'queda'
+    const pct = l.delta_pct === null ? 's/ base' : `${Math.abs(l.delta_pct).toFixed(1)}%`
+    return {
+      linha: l.linha,
+      driver: `Mock: ${dir} de R$ ${Math.abs(l.delta).toLocaleString('pt-BR')} (${pct}) vs. mês anterior`,
+      magnitude: `R$ ${l.delta.toLocaleString('pt-BR')}`,
+    }
+  })
+  const resumo = destaques.length
+    ? `Mock: ${destaques.length} variação(ões) material(is) no mês ${input.mes_ref}. ` +
+      destaques.map((d) => d.driver).join(' ')
+    : `Mock: sem variações materiais em ${input.mes_ref}.`
+  return { resumo, destaques }
+}
+
 // ===== real (Anthropic SDK + prompt caching) =====
 
 let _client: Anthropic | null = null
@@ -105,7 +135,7 @@ function getClient() {
   return _client
 }
 
-async function readSkillPrompt(name: 'categorizacao' | 'reconciliacao'): Promise<string> {
+async function readSkillPrompt(name: 'categorizacao' | 'reconciliacao' | 'commentary'): Promise<string> {
   const p = path.join(process.cwd(), 'prompts', name, 'SKILL.md')
   return readFile(p, 'utf-8')
 }
@@ -176,6 +206,39 @@ Retorne APENAS um JSON com {"classificacao": "<uma das 7 categorias>", "melhor_m
   const text = resp.content[0]?.type === 'text' ? resp.content[0].text : ''
   const parsed = extractJSON(text)
   return BreakClassification.parse(parsed)
+}
+
+async function realCommentary(input: CommentaryInput): Promise<CommentaryResult> {
+  const sys = await readSkillPrompt('commentary')
+  const client = getClient()
+
+  const linhasTxt = input.linhas
+    .map((l) => {
+      const pct = l.delta_pct === null ? 's/ base' : `${l.delta_pct.toFixed(1)}%`
+      return `- ${l.linha}: atual R$ ${l.atual.toFixed(2)} | anterior R$ ${l.anterior.toFixed(2)} | Δ R$ ${l.delta.toFixed(2)} (${pct})`
+    })
+    .join('\n')
+
+  const userText = `
+Mês de referência: ${input.mes_ref}
+Materialidade: max(${input.thresholds.pct}% da categoria, R$ ${input.thresholds.abs})
+
+Linhas de variância (mês-a-mês, já filtradas por materialidade):
+${linhasTxt || '(nenhuma linha material)'}
+
+Retorne APENAS um JSON com {"resumo": "<3-5 sentenças PT-BR>", "destaques": [{"linha": "<nome>", "driver": "<explicação do driver>", "magnitude": "<valor>"}]}.
+`.trim()
+
+  const resp = await client.messages.create({
+    model: 'claude-haiku-4-5',
+    max_tokens: 600,
+    system: [{ type: 'text', text: sys, cache_control: { type: 'ephemeral' } }],
+    messages: [{ role: 'user', content: userText }],
+  })
+
+  const text = resp.content[0]?.type === 'text' ? resp.content[0].text : ''
+  const parsed = extractJSON(text)
+  return CommentaryResult.parse(parsed)
 }
 
 function extractJSON(text: string): unknown {
