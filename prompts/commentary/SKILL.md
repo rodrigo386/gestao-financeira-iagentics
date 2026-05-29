@@ -1,6 +1,6 @@
 ---
 name: commentary-mensal
-description: Gera comentário executivo 3-5 sentenças sobre variações Forecast vs. realizado
+description: Gera comentário executivo 3-5 sentenças sobre variações mês-a-mês (MoM), enquadradas em crescimento de MRR, burn e runway
 model: claude-haiku-4-5
 inputs:
   - mes_ref (date)
