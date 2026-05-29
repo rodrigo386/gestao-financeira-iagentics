@@ -30,12 +30,18 @@ persistência de métricas mensais (fechamento) que faltava no sistema.
 - **D1 — Fechamento manual.** Admin clica "Fechar mês [mês anterior]" no dashboard, o que
   grava o snapshot e dispara o commentary IA. Alinha com o limite do §13.3 ("1x/mês, não
   ad-hoc") e mantém o custo de LLM sob controle. Sem cron.
-- **D2 — Variância MoM (divergência consciente do §13.3).** O spec mãe descreve o
-  commentary como "Forecast vs. realizado". Optamos por comparar o mês realizado contra o
-  **mês realizado anterior** (variância mês-a-mês). É mais simples (não exige congelar
-  baseline de forecast) e suficiente para a leitura executiva atual. Caso forecast-vs-real
-  seja necessário no futuro, exigirá congelar a projeção Base por mês — fica registrado
-  como evolução possível.
+- **D2 — Variância MoM com foco de sobrevivência (divergência consciente do §13.3).** O
+  spec mãe descreve o commentary como "Forecast vs. realizado". Para o estágio atual
+  (2 clientes pagantes, meta de 10) isso seria **ruído, não sinal**: com base de contratos
+  tão pequena, um único contrato move a agulha e a variância contra qualquer forecast é
+  dominada por aleatoriedade, não por desempenho. A leitura executiva útil cedo é a
+  **trajetória mês-a-mês das métricas de sobrevivência**: taxa de crescimento de MRR (MoM %),
+  burn líquido (despesa − receita) e variação de runway. Portanto o commentary compara o mês
+  realizado contra o **mês realizado anterior** (variância MoM), enquadrado nesses três eixos.
+  **Gatilho para revisitar:** quando a base atingir ~10 contratos ativos (a meta declarada),
+  o plano passa a ser estável o suficiente para forecast-vs-realizado virar sinal — nesse
+  ponto, congelar a projeção Base por mês e adicionar a comparação contra o plano. Registrado
+  como evolução futura, fora do escopo da Fase 6.
 - **D3 — Arquitetura: módulo `metricas` dedicado.** Lógica financeira em
   `src/modules/metricas/`, testável isoladamente, seguindo o padrão `modules/<domínio>`. O
   `loadSnapshot` do forecast permanece (propósito forward-looking distinto); o reuso real é
@@ -92,10 +98,11 @@ regrava métricas e regera commentary).
 
 - **`commentary.ts` — `gerarCommentary(atual, anterior): Promise<{resumo, destaques}>`**
   Monta `linhas_variancia` MoM (mrr, receita_total, despesa_total, caixa_fim, resultado),
-  filtra pela materialidade `max(5% da categoria, R$ 50)`, e chama o LLM (Claude Haiku 4.5
-  via client existente, `LLM_MODE=mock` por padrão) com o prompt de `prompts/commentary/SKILL.md`.
-  Sem mês anterior → resumo neutro ("primeiro mês fechado, sem base de comparação"),
-  `destaques = []`, sem chamada de LLM.
+  e deriva os três eixos de sobrevivência (D2): crescimento de MRR MoM %, burn líquido
+  (despesa − receita) e Δ runway. Filtra pela materialidade `max(5% da categoria, R$ 50)`,
+  e chama o LLM (Claude Haiku 4.5 via client existente, `LLM_MODE=mock` por padrão) com o
+  prompt de `prompts/commentary/SKILL.md`. Sem mês anterior → resumo neutro ("primeiro mês
+  fechado, sem base de comparação"), `destaques = []`, sem chamada de LLM.
 
 ## 6. UI — Dashboard (`src/app/(dashboard)/page.tsx`)
 
@@ -120,8 +127,10 @@ Server Component, substitui o placeholder. Layout vertical:
 Preencher o stub existente:
 - **Inputs:** `mes_ref`, `linhas_variancia` (array MoM já filtrado por materialidade),
   `thresholds` (`{pct: 5, abs: 50}`).
-- **Procedimento:** para cada linha material, explicar o **driver** da variação (não apenas
-  restituir o percentual); priorizar as maiores magnitudes; 3-5 sentenças no resumo.
+- **Procedimento:** enquadrar o resumo nos três eixos de sobrevivência (crescimento de MRR
+  MoM %, burn líquido, Δ runway); para cada linha material, explicar o **driver** da variação
+  (não apenas restituir o percentual); priorizar as maiores magnitudes e o que afeta runway;
+  3-5 sentenças no resumo.
 - **Outputs:** `resumo` (string PT-BR, 3-5 sentenças), `destaques`
   (`[{linha, driver, magnitude}]`).
 - **Restrições:** nunca inventar números (usar só dados de entrada); sempre PT-BR; 1x/mês.
