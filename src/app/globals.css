@@ -8,8 +8,11 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-mono: var(--font-mono);
   --font-heading: var(--font-sans);
+  --color-brand: var(--brand-violet);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-purple: var(--brand-purple);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -49,13 +52,20 @@
 }
 
 :root {
+  /* IAgentics brand gradient — sampled from the logo (cornflower → violet → deep purple) */
+  --brand-blue: #6E8BF5;
+  --brand-violet: #8350F0;
+  --brand-purple: #5B1AAE;
+  --brand-bright: #b06bff;
+  --brand-grad: linear-gradient(90deg, #6E8BF5 0%, #8350F0 52%, #b06bff 100%);
+
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  --primary: #8350F0;
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
@@ -66,55 +76,57 @@
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
+  --ring: #8350F0;
+  --chart-1: #6E8BF5;
+  --chart-2: #8350F0;
+  --chart-3: #b06bff;
+  --chart-4: #c9943e;
   --chart-5: oklch(0.269 0 0);
   --radius: 0.625rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary: #8350F0;
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.97 0 0);
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar-ring: #8350F0;
 }
 
+/* IAgentics "terminal" dark scope — violet-black surfaces with brand accents.
+   Applied wherever .dark is set (currently: the dashboard terminal panel). */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: #080612;
+  --foreground: #e7e3fb;
+  --card: #0e0b1e;
+  --card-foreground: #e7e3fb;
+  --popover: #0e0b1e;
+  --popover-foreground: #e7e3fb;
+  --primary: #b06bff;
+  --primary-foreground: #0e0b1e;
+  --secondary: #130f28;
+  --secondary-foreground: #e7e3fb;
+  --muted: #130f28;
+  --muted-foreground: #8b82b8;
+  --accent: #1a1436;
+  --accent-foreground: #e7e3fb;
+  --destructive: #ff5d72;
+  --border: #241c40;
+  --input: #241c40;
+  --ring: #8350F0;
+  --chart-1: #6E8BF5;
+  --chart-2: #b06bff;
+  --chart-3: #c9943e;
+  --chart-4: #8350F0;
+  --chart-5: #ff6f9a;
+  --sidebar: #0b0818;
+  --sidebar-foreground: #e7e3fb;
+  --sidebar-primary: #b06bff;
+  --sidebar-primary-foreground: #0e0b1e;
+  --sidebar-accent: #1a1436;
+  --sidebar-accent-foreground: #e7e3fb;
+  --sidebar-border: #241c40;
+  --sidebar-ring: #8350F0;
 }
 
 @layer base {
@@ -126,5 +138,42 @@
   }
   html {
     @apply font-sans;
+  }
+}
+
+@layer utilities {
+  /* IAgentics brand helpers */
+  .brand-grad-text {
+    background: var(--brand-grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .brand-grad-bg {
+    background: var(--brand-grad);
+  }
+  .brand-grad-border {
+    border-image: var(--brand-grad) 1;
+  }
+  /* Terminal atmosphere — violet glow + faint scanlines, for the dashboard panel */
+  .terminal-surface {
+    background-color: var(--background);
+    background-image:
+      radial-gradient(820px 360px at 88% -10%, rgba(131, 80, 240, 0.16), transparent 62%),
+      radial-gradient(640px 280px at 6% 2%, rgba(110, 139, 245, 0.1), transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 38px, rgba(255, 255, 255, 0.012) 39px);
+  }
+  .terminal-tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  .animate-rise {
+    animation: brand-rise 0.55s ease both;
+  }
+  @keyframes brand-rise {
+    from { opacity: 0; transform: translateY(13px); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes brand-pulse {
+    50% { opacity: 0.35; }
   }
 }

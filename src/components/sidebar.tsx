@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { BrandLogo } from '@/components/brand-logo'
 
 const NAV = [
   { href: '/',                  label: 'Dashboard' },
@@ -24,7 +25,12 @@ export function Sidebar({ alertasUnread = 0 }: { alertasUnread?: number }) {
   const pathname = usePathname()
   return (
     <aside className="w-64 border-r bg-neutral-50 dark:bg-neutral-950 min-h-screen p-4">
-      <div className="font-semibold mb-6 px-2">IAgentics Finanças</div>
+      <div className="mb-1 px-2 pt-1">
+        <BrandLogo size={26} />
+      </div>
+      <div className="mb-6 px-2 text-[11px] font-medium uppercase tracking-[0.22em] text-neutral-400">
+        Gestão Financeira
+      </div>
       <nav className="flex flex-col gap-1">
         {NAV.map((item) => {
           const active = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))
@@ -33,10 +39,10 @@ export function Sidebar({ alertasUnread = 0 }: { alertasUnread?: number }) {
               key={item.href}
               href={item.href}
               className={
-                'px-3 py-2 rounded-md text-sm transition-colors flex items-center ' +
+                'px-3 py-2 rounded-md text-sm transition-colors flex items-center border-l-2 ' +
                 (active
-                  ? 'bg-neutral-200 dark:bg-neutral-800 font-medium'
-                  : 'hover:bg-neutral-100 dark:hover:bg-neutral-900')
+                  ? 'border-primary bg-primary/10 text-primary font-semibold'
+                  : 'border-transparent text-neutral-700 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-900')
               }
             >
               {item.label}

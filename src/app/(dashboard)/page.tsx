@@ -1,13 +1,14 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { TendenciaChart } from '@/components/tendencia-chart'
+import { BrandLogo } from '@/components/brand-logo'
 import { loadSnapshot } from '@/modules/forecast/snapshot'
 
-const SEV_VARIANT: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
-  info: 'secondary', warning: 'outline', critical: 'destructive',
+const SEV_LABEL: Record<string, { cls: string; txt: string }> = {
+  info: { cls: 'border-[var(--brand-blue)]/40 text-[var(--brand-blue)]', txt: 'info' },
+  warning: { cls: 'border-amber-400/40 text-amber-400', txt: 'atenção' },
+  critical: { cls: 'border-rose-400/40 text-rose-400', txt: 'crítico' },
 }
 const MESES_PT = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez']
 
@@ -63,6 +64,11 @@ export default async function HomePage() {
   }))
   const ultimoFechado = fechados.length ? fechados[fechados.length - 1] : null
 
+  // MoM delta de MRR (real): MRR ao vivo vs. último mês fechado
+  const mrrAnterior = ultimoFechado ? Number(ultimoFechado.mrr) : null
+  const mrrDelta = mrrAnterior !== null ? snap.mrrAtual - mrrAnterior : null
+  const mrrDeltaPct = mrrAnterior ? (mrrDelta! / mrrAnterior) * 100 : null
+
   // Alertas recentes não-lidos (critical/warning primeiro)
   const { data: alertas } = await supabase
     .from('alertas').select('*').eq('lido', false).order('criado_em', { ascending: false }).limit(50)
@@ -84,100 +90,157 @@ export default async function HomePage() {
     revalidatePath('/')
   }
 
+  const destaques = (Array.isArray(ultimoFechado?.commentary_destaques)
+    ? (ultimoFechado!.commentary_destaques as { linha: string; driver: string; magnitude: string }[])
+    : [])
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Dashboard</h1>
-        <p className="text-neutral-600">Olá, <strong>{usuario?.nome ?? user!.email}</strong> ({usuario?.role ?? '?'}).</p>
+    <div className="dark terminal-surface text-foreground rounded-2xl border border-border overflow-hidden">
+      {/* ticker */}
+      <div className="flex items-center gap-6 overflow-x-auto border-b border-border px-5 h-11 font-mono text-xs text-muted-foreground">
+        <span className="size-1.5 flex-none rounded-full bg-[var(--brand-blue)] shadow-[0_0_10px_var(--brand-violet)]"
+          style={{ animation: 'brand-pulse 1.8s infinite' }} />
+        <Tk k="MRR" v={brl(snap.mrrAtual)} />
+        <Tk k="CAIXA" v={brl(snap.caixaAtual)} />
+        <Tk k="RUNWAY" v={runwayBase === null ? '> 36m' : `${runwayBase}m`} />
+        <Tk k="BURN" v={brl(burn)} />
+        <Tk k="AR 30D" v={brl(snap.arPrevisto30d)} />
+        <Tk k="CONTRATOS" v={String(snap.contratosAtivos)} />
       </div>
 
-      {/* KPI cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        <Kpi titulo="MRR" valor={brl(snap.mrrAtual)} />
-        <Kpi titulo="Caixa atual" valor={brl(snap.caixaAtual)} />
-        <Kpi titulo="Runway" valor={runwayBase === null ? '> 36 meses' : `${runwayBase} meses`} />
-        <Kpi titulo="Burn mensal" valor={brl(burn)} />
-        <Kpi titulo="AR (30d)" valor={brl(snap.arPrevisto30d)} />
-        <Kpi titulo="Contratos ativos" valor={String(snap.contratosAtivos)} />
-      </div>
+      <div className="p-6 space-y-5">
+        {/* header */}
+        <div className="flex flex-wrap items-center gap-4 animate-rise">
+          <BrandLogo size={30} />
+          <span className="font-mono text-[10px] font-bold tracking-[0.22em] text-[var(--brand-blue)] border border-border rounded px-2 py-1">
+            // FIN · TERMINAL
+          </span>
+          <div className="ml-auto text-right">
+            <div className="text-sm text-muted-foreground">A primeira força de trabalho de IA para aquisição</div>
+            <div className="mt-0.5 font-mono text-[11px] tracking-wider text-muted-foreground/70">
+              PAINEL EXECUTIVO · {labelMes(mesAtual).toUpperCase()} · {usuario?.nome ?? user!.email} ({usuario?.role ?? '?'})
+            </div>
+          </div>
+        </div>
+        <div className="h-0.5 rounded brand-grad-bg opacity-80" />
 
-      {/* Tendência */}
-      <Card>
-        <CardHeader><CardTitle>Tendência (meses fechados)</CardTitle></CardHeader>
-        <CardContent>
-          {tendencia.length < 2
-            ? <p className="text-neutral-500 text-sm">Feche ao menos 2 meses para ver a tendência.</p>
-            : <TendenciaChart rows={tendencia} />}
-        </CardContent>
-      </Card>
+        {/* KPI grid — hairline cells */}
+        <div className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-border bg-border md:grid-cols-3 lg:grid-cols-6">
+          <Kpi i={0} label="MRR" value={brl(snap.mrrAtual)}
+            sub={mrrDelta !== null ? `${mrrDelta >= 0 ? '▲' : '▼'} ${brl(Math.abs(mrrDelta))}${mrrDeltaPct !== null ? ` · ${mrrDeltaPct >= 0 ? '+' : ''}${mrrDeltaPct.toFixed(1)}%` : ''}` : 'sem base m/m'}
+            tone={mrrDelta !== null && mrrDelta < 0 ? 'down' : 'up'} />
+          <Kpi i={1} label="ARR" value={brl(snap.mrrAtual * 12)} sub="proj. 12m" />
+          <Kpi i={2} label="Caixa" value={brl(snap.caixaAtual)} sub="atual consolidado" />
+          <Kpi i={3} label="Runway" value={runwayBase === null ? '> 36 meses' : `${runwayBase} meses`} sub="cenário base" flag />
+          <Kpi i={4} label="Burn líq." value={brl(burn)} sub="média / mês" />
+          <Kpi i={5} label="Contratos" value={String(snap.contratosAtivos)} sub="ativos · meta 10" />
+        </div>
 
-      {/* Comentário mensal IA */}
-      <Card>
-        <CardHeader><CardTitle>Comentário mensal IA{ultimoFechado ? ` — ${labelMes(ultimoFechado.mes_ref as string)}` : ''}</CardTitle></CardHeader>
-        <CardContent>
-          {!ultimoFechado || !ultimoFechado.commentary_resumo
-            ? <p className="text-neutral-500 text-sm">Nenhum mês fechado ainda.</p>
-            : (
-              <div className="space-y-3">
-                <p className="text-sm text-neutral-700">{ultimoFechado.commentary_resumo as string}</p>
-                {Array.isArray(ultimoFechado.commentary_destaques) && (ultimoFechado.commentary_destaques as unknown[]).length > 0 && (
-                  <ul className="text-sm text-neutral-600 list-disc pl-5 space-y-1">
-                    {(ultimoFechado.commentary_destaques as { linha: string; driver: string; magnitude: string }[]).map((d, i) => (
-                      <li key={i}><strong>{d.linha}</strong>: {d.driver} ({d.magnitude})</li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            )}
-        </CardContent>
-      </Card>
+        <div className="grid gap-4 lg:grid-cols-[1.7fr_1fr]">
+          {/* tendência */}
+          <Panel title="Tendência · meses fechados" tag="MRR / CAIXA">
+            {tendencia.length < 2
+              ? <Empty>Feche ao menos 2 meses para ver a tendência.</Empty>
+              : <TendenciaChart rows={tendencia} />}
+          </Panel>
 
-      {/* Alertas recentes */}
-      <Card>
-        <CardHeader><CardTitle>Alertas recentes</CardTitle></CardHeader>
-        <CardContent>
+          {/* comentário IA */}
+          <Panel title={`Comentário IA${ultimoFechado ? ` · ${labelMes(ultimoFechado.mes_ref as string)}` : ''}`} tag="MoM">
+            {!ultimoFechado || !ultimoFechado.commentary_resumo
+              ? <Empty>Nenhum mês fechado ainda.</Empty>
+              : (
+                <div className="space-y-3">
+                  <p className="text-sm leading-relaxed text-foreground/85">{ultimoFechado.commentary_resumo as string}</p>
+                  {destaques.length > 0 && (
+                    <div className="grid gap-2">
+                      {destaques.map((d, i) => (
+                        <div key={i} className="flex items-baseline gap-2 border-t border-dashed border-border pt-2 text-xs">
+                          <span className="brand-grad-text min-w-[110px] font-semibold uppercase tracking-wide">{d.linha}</span>
+                          <span className="text-muted-foreground">{d.driver}</span>
+                          <span className="ml-auto terminal-tabular text-[var(--brand-blue)]">{d.magnitude}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+          </Panel>
+        </div>
+
+        {/* alertas */}
+        <Panel title="Alertas recentes" tag={`${alertasTop.length} não lidos`}>
           {alertasTop.length === 0
-            ? <p className="text-neutral-500 text-sm">Nenhum alerta não-lido.</p>
+            ? <Empty>Nenhum alerta não-lido.</Empty>
             : (
               <div className="space-y-2">
-                {alertasTop.map((a) => (
-                  <div key={a.id} className="flex items-center gap-2 text-sm">
-                    <Badge variant={SEV_VARIANT[a.severidade as string]}>{a.severidade}</Badge>
-                    <span className="font-medium">{a.titulo}</span>
-                    <span className="text-neutral-500">— {a.mensagem}</span>
-                  </div>
-                ))}
-                <a href="/alertas" className="text-sm text-blue-600 hover:underline">Ver todos →</a>
+                {alertasTop.map((a) => {
+                  const sev = SEV_LABEL[a.severidade as string] ?? SEV_LABEL.info
+                  return (
+                    <div key={a.id} className="flex items-center gap-3 rounded-md border border-border bg-secondary/60 px-3 py-2.5 text-sm">
+                      <span className={`rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide border ${sev!.cls}`}>{sev!.txt}</span>
+                      <span className="font-medium">{a.titulo}</span>
+                      <span className="text-muted-foreground">— {a.mensagem}</span>
+                    </div>
+                  )
+                })}
+                <a href="/alertas" className="inline-block text-sm text-[var(--brand-blue)] hover:underline">Ver todos →</a>
               </div>
             )}
-        </CardContent>
-      </Card>
+        </Panel>
 
-      {/* Fechamento (admin) */}
-      {isAdmin && (
-        <Card>
-          <CardHeader><CardTitle>Fechamento mensal</CardTitle></CardHeader>
-          <CardContent className="flex items-center gap-4">
-            <p className="text-sm text-neutral-600">
-              Último fechado: {ultimoFechado ? labelMes(ultimoFechado.mes_ref as string) : '—'}
-            </p>
-            <form action={fecharMesAction}>
-              <Button type="submit">Fechar mês {labelMes(mesAFechar)}</Button>
-            </form>
-          </CardContent>
-        </Card>
+        {/* fechamento (admin) */}
+        {isAdmin && (
+          <Panel title="Fechamento mensal">
+            <div className="flex flex-wrap items-center gap-4">
+              <p className="text-sm text-muted-foreground">
+                Último fechado: <span className="text-foreground">{ultimoFechado ? labelMes(ultimoFechado.mes_ref as string) : '—'}</span>
+              </p>
+              <form action={fecharMesAction} className="ml-auto">
+                <Button type="submit">Fechar mês {labelMes(mesAFechar)}</Button>
+              </form>
+            </div>
+          </Panel>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function Tk({ k, v }: { k: string; v: string }) {
+  return (
+    <span className="flex-none whitespace-nowrap">
+      {k} <b className="text-foreground terminal-tabular">{v}</b>
+    </span>
+  )
+}
+
+function Kpi({ i, label, value, sub, tone, flag }: {
+  i: number; label: string; value: string; sub?: string; tone?: 'up' | 'down'; flag?: boolean
+}) {
+  return (
+    <div className="relative bg-card p-4 animate-rise" style={{ animationDelay: `${i * 0.05}s` }}>
+      {flag && <span className="absolute inset-y-0 left-0 w-0.5 brand-grad-bg" />}
+      <div className="font-sans text-[10.5px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">{label}</div>
+      <div className="mt-2.5 terminal-tabular text-[22px] font-bold tracking-tight">{value}</div>
+      {sub && (
+        <div className={`mt-1.5 terminal-tabular text-[11px] ${tone === 'up' ? 'text-[var(--brand-blue)]' : tone === 'down' ? 'text-rose-400' : 'text-muted-foreground'}`}>{sub}</div>
       )}
     </div>
   )
 }
 
-function Kpi({ titulo, valor }: { titulo: string; valor: string }) {
+function Panel({ title, tag, children }: { title: string; tag?: string; children: React.ReactNode }) {
   return (
-    <Card>
-      <CardContent className="pt-6">
-        <div className="text-sm text-neutral-500">{titulo}</div>
-        <div className="text-xl font-semibold">{valor}</div>
-      </CardContent>
-    </Card>
+    <section className="animate-rise rounded-lg border border-border bg-card p-[18px]">
+      <div className="flex items-center gap-2 font-sans text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+        {title}
+        {tag && <span className="ml-auto rounded border border-border px-2 py-0.5 font-mono text-[10px] tracking-wide text-[var(--brand-blue)]">{tag}</span>}
+      </div>
+      <div className="mt-3.5">{children}</div>
+    </section>
   )
+}
+
+function Empty({ children }: { children: React.ReactNode }) {
+  return <p className="text-sm text-muted-foreground">{children}</p>
 }
