@@ -68,3 +68,4 @@ npm run test:e2e           # playwright (precisa supabase start)
 | 4 ✅ | Bancos (Pluggy) + Categorização |
 | 5 ✅ | Forecast + Alertas |
 | 6 ✅ | Dashboard Executivo (KPIs, tendência, commentary IA, fechamento mensal) |
+| 7 ✅ | Copiloto Financeiro (Managed Agent — Q&A read-only + what-if + ações confirmadas) |
