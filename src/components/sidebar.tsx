@@ -24,11 +24,11 @@ const NAV = [
 export function Sidebar({ alertasUnread = 0 }: { alertasUnread?: number }) {
   const pathname = usePathname()
   return (
-    <aside className="w-64 border-r bg-neutral-50 dark:bg-neutral-950 min-h-screen p-4">
+    <aside className="w-64 border-r border-sidebar-border bg-sidebar text-sidebar-foreground min-h-screen p-4">
       <div className="mb-1 px-2 pt-1">
         <BrandLogo size={26} />
       </div>
-      <div className="mb-6 px-2 text-[11px] font-medium uppercase tracking-[0.22em] text-neutral-400">
+      <div className="mb-6 px-2 text-[11px] font-medium uppercase tracking-[0.22em] text-muted-foreground">
         Gestão Financeira
       </div>
       <nav className="flex flex-col gap-1">
@@ -42,12 +42,12 @@ export function Sidebar({ alertasUnread = 0 }: { alertasUnread?: number }) {
                 'px-3 py-2 rounded-md text-sm transition-colors flex items-center border-l-2 ' +
                 (active
                   ? 'border-primary bg-primary/10 text-primary font-semibold'
-                  : 'border-transparent text-neutral-700 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-900')
+                  : 'border-transparent text-muted-foreground hover:bg-accent hover:text-foreground')
               }
             >
               {item.label}
               {item.href === '/alertas' && alertasUnread > 0 ? (
-                <span className="ml-2 inline-block min-w-[20px] text-center bg-red-600 text-white text-xs rounded-full px-1.5 py-0.5">
+                <span className="ml-2 inline-block min-w-[20px] text-center bg-rose-500 text-white text-xs rounded-full px-1.5 py-0.5">
                   {alertasUnread > 99 ? '99+' : alertasUnread}
                 </span>
               ) : null}

@@ -23,7 +23,7 @@ export default async function CopilotoPage() {
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-semibold">Copiloto Financeiro</h1>
-      <p className="text-sm text-neutral-500">Pergunte sobre MRR, runway, despesas, simule cenários ou peça ações (com confirmação).</p>
+      <p className="text-sm text-muted-foreground">Pergunte sobre MRR, runway, despesas, simule cenários ou peça ações (com confirmação).</p>
       <CopilotoChat executarAcao={executarAcaoAction} />
     </div>
   )

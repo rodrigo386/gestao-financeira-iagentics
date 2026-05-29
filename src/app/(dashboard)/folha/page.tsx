@@ -48,7 +48,7 @@ export default async function FolhaPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold">Folha de Pagamento</h1>
-        <p className="text-sm text-neutral-500">Gestão de corridas de folha CLT</p>
+        <p className="text-sm text-muted-foreground">Gestão de corridas de folha CLT</p>
       </div>
 
       {/* Summary Cards */}
@@ -59,7 +59,7 @@ export default async function FolhaPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-1">
-              <p className="text-sm text-neutral-500">{formatMesRef(mesRef)}</p>
+              <p className="text-sm text-muted-foreground">{formatMesRef(mesRef)}</p>
               {folhaAtual ? (
                 <Badge variant={folhaAtual.status === 'fechada' ? 'secondary' : 'default'}>
                   {folhaAtual.status === 'fechada' ? 'Fechada' : 'Aberta'}
@@ -77,7 +77,7 @@ export default async function FolhaPage() {
           </CardHeader>
           <CardContent>
             <p className="text-xl font-semibold">{formatBRL(totalBruto)}</p>
-            <p className="text-xs text-neutral-500 mt-1">soma salários base ativos</p>
+            <p className="text-xs text-muted-foreground mt-1">soma salários base ativos</p>
           </CardContent>
         </Card>
 
@@ -87,7 +87,7 @@ export default async function FolhaPage() {
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold">{numFuncionarios}</p>
-            <Link href="/folha/funcionarios" className="text-xs text-neutral-500 underline mt-1 block">
+            <Link href="/folha/funcionarios" className="text-xs text-muted-foreground underline mt-1 block">
               Ver lista
             </Link>
           </CardContent>
@@ -99,7 +99,7 @@ export default async function FolhaPage() {
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold">{numPJSpot}</p>
-            <Link href="/folha/pj-spot" className="text-xs text-neutral-500 underline mt-1 block">
+            <Link href="/folha/pj-spot" className="text-xs text-muted-foreground underline mt-1 block">
               Ver lista
             </Link>
           </CardContent>
@@ -130,26 +130,26 @@ export default async function FolhaPage() {
         </CardHeader>
         <CardContent className="space-y-2 text-sm">
           <div className="flex items-center gap-2">
-            <span className="text-neutral-400">1.</span>
-            <Link href="/folha/funcionarios" className="underline text-neutral-700 dark:text-neutral-300">
+            <span className="text-muted-foreground">1.</span>
+            <Link href="/folha/funcionarios" className="underline text-foreground">
               Cadastrar funcionários CLT
             </Link>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-neutral-400">2.</span>
-            <Link href="/folha/corridas" className="underline text-neutral-700 dark:text-neutral-300">
+            <span className="text-muted-foreground">2.</span>
+            <Link href="/folha/corridas" className="underline text-foreground">
               Abrir uma corrida de folha
             </Link>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-neutral-400">3.</span>
-            <span className="text-neutral-500">
+            <span className="text-muted-foreground">3.</span>
+            <span className="text-muted-foreground">
               Revisar itens e fechar folha (gera APs + holerites PDF)
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-neutral-400">4.</span>
-            <Link href="/contas-pagar" className="underline text-neutral-700 dark:text-neutral-300">
+            <span className="text-muted-foreground">4.</span>
+            <Link href="/contas-pagar" className="underline text-foreground">
               Aprovar e pagar via Contas a Pagar
             </Link>
           </div>

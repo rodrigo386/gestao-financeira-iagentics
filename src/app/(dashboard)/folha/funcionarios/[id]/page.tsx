@@ -52,24 +52,24 @@ export default async function FuncionarioDetailPage({ params }: { params: Promis
           <CardHeader><CardTitle>Identificação</CardTitle></CardHeader>
           <CardContent className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-neutral-500">Cargo</span>
+              <span className="text-muted-foreground">Cargo</span>
               <span>{funcionario.cargo}</span>
             </div>
             {funcionario.cpf && (
               <div className="flex justify-between">
-                <span className="text-neutral-500">CPF</span>
+                <span className="text-muted-foreground">CPF</span>
                 <span>{funcionario.cpf}</span>
               </div>
             )}
             {funcionario.centro_custo && (
               <div className="flex justify-between">
-                <span className="text-neutral-500">Centro de Custo</span>
+                <span className="text-muted-foreground">Centro de Custo</span>
                 <span>{funcionario.centro_custo}</span>
               </div>
             )}
             {funcionario.chave_pix && (
               <div className="flex justify-between">
-                <span className="text-neutral-500">Chave PIX</span>
+                <span className="text-muted-foreground">Chave PIX</span>
                 <span>{funcionario.chave_pix}</span>
               </div>
             )}
@@ -81,7 +81,7 @@ export default async function FuncionarioDetailPage({ params }: { params: Promis
           <CardHeader><CardTitle>Remuneração</CardTitle></CardHeader>
           <CardContent className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-neutral-500">Salário Base</span>
+              <span className="text-muted-foreground">Salário Base</span>
               <span className="font-medium">{formatBRL(funcionario.salario_base)}</span>
             </div>
           </CardContent>
@@ -92,19 +92,19 @@ export default async function FuncionarioDetailPage({ params }: { params: Promis
           <CardHeader><CardTitle>Benefícios</CardTitle></CardHeader>
           <CardContent className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-neutral-500">VR (valor/dia)</span>
+              <span className="text-muted-foreground">VR (valor/dia)</span>
               <span>{formatBRL(Number(b.vr ?? 0))}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-neutral-500">VR (dias/mês)</span>
+              <span className="text-muted-foreground">VR (dias/mês)</span>
               <span>{String(b.vr_dias ?? 0)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-neutral-500">VA (R$/mês)</span>
+              <span className="text-muted-foreground">VA (R$/mês)</span>
               <span>{formatBRL(Number(b.va ?? 0))}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-neutral-500">Plano de Saúde</span>
+              <span className="text-muted-foreground">Plano de Saúde</span>
               <span>{formatBRL(Number(b.plano_saude ?? 0))}</span>
             </div>
           </CardContent>
@@ -115,19 +115,19 @@ export default async function FuncionarioDetailPage({ params }: { params: Promis
           <CardHeader><CardTitle>Encargos (%)</CardTitle></CardHeader>
           <CardContent className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-neutral-500">FGTS</span>
+              <span className="text-muted-foreground">FGTS</span>
               <span>{String(e.fgts ?? 8)}%</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-neutral-500">INSS Patronal</span>
+              <span className="text-muted-foreground">INSS Patronal</span>
               <span>{String(e.inss_patronal ?? 20)}%</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-neutral-500">Provisão 13º</span>
+              <span className="text-muted-foreground">Provisão 13º</span>
               <span>{String(e.provisao_13 ?? 8.33)}%</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-neutral-500">Provisão Férias</span>
+              <span className="text-muted-foreground">Provisão Férias</span>
               <span>{String(e.provisao_ferias ?? 11.11)}%</span>
             </div>
           </CardContent>
@@ -138,12 +138,12 @@ export default async function FuncionarioDetailPage({ params }: { params: Promis
           <CardHeader><CardTitle>Datas</CardTitle></CardHeader>
           <CardContent className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-neutral-500">Admissão</span>
+              <span className="text-muted-foreground">Admissão</span>
               <span>{funcionario.data_admissao}</span>
             </div>
             {funcionario.data_desligamento && (
               <div className="flex justify-between">
-                <span className="text-neutral-500">Desligamento</span>
+                <span className="text-muted-foreground">Desligamento</span>
                 <span>{funcionario.data_desligamento}</span>
               </div>
             )}
@@ -155,11 +155,11 @@ export default async function FuncionarioDetailPage({ params }: { params: Promis
       <section>
         <h2 className="text-lg font-medium mb-3">Histórico de Folha ({itensTyped.length})</h2>
         {itensTyped.length === 0 ? (
-          <p className="text-sm text-neutral-500">Nenhuma folha processada para este funcionário.</p>
+          <p className="text-sm text-muted-foreground">Nenhuma folha processada para este funcionário.</p>
         ) : (
           <div className="border rounded-md">
             <table className="w-full text-sm">
-              <thead className="bg-neutral-50 dark:bg-neutral-900 text-left">
+              <thead className="bg-muted text-left">
                 <tr>
                   <th className="px-4 py-3">Mês de Ref.</th>
                   <th className="px-4 py-3">Status Folha</th>
@@ -185,7 +185,7 @@ export default async function FuncionarioDetailPage({ params }: { params: Promis
                           Baixar PDF
                         </Link>
                       ) : (
-                        <span className="text-neutral-400">—</span>
+                        <span className="text-muted-foreground">—</span>
                       )}
                     </td>
                   </tr>

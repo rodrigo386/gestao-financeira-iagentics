@@ -23,7 +23,7 @@ export default async function ProjetosPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold">Projetos</h1>
-          <p className="text-sm text-neutral-500">{projetos.length} projeto(s) cadastrados</p>
+          <p className="text-sm text-muted-foreground">{projetos.length} projeto(s) cadastrados</p>
         </div>
         <Link href="/receitas/projetos/novo">
           <Button>Novo projeto</Button>
@@ -32,7 +32,7 @@ export default async function ProjetosPage() {
 
       <div className="border rounded-md">
         <table className="w-full text-sm">
-          <thead className="bg-neutral-50 dark:bg-neutral-900 text-left">
+          <thead className="bg-muted text-left">
             <tr>
               <th className="px-4 py-3">Cliente</th>
               <th className="px-4 py-3">Nome</th>
@@ -46,19 +46,19 @@ export default async function ProjetosPage() {
           <tbody>
             {projetos.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-4 py-6 text-center text-neutral-500">
+                <td colSpan={7} className="px-4 py-6 text-center text-muted-foreground">
                   Nenhum projeto cadastrado ainda.
                 </td>
               </tr>
             ) : projetos.map((p) => (
               <tr key={p.id} className="border-t">
-                <td className="px-4 py-3 text-neutral-600">{clienteMap.get(p.cliente_id) ?? '—'}</td>
+                <td className="px-4 py-3 text-muted-foreground">{clienteMap.get(p.cliente_id) ?? '—'}</td>
                 <td className="px-4 py-3 font-medium">{p.nome}</td>
-                <td className="px-4 py-3 text-neutral-600">
+                <td className="px-4 py-3 text-muted-foreground">
                   R$ {p.valor_total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </td>
-                <td className="px-4 py-3 text-neutral-600">{p.data_inicio}</td>
-                <td className="px-4 py-3 text-neutral-600">{p.data_prevista_fim}</td>
+                <td className="px-4 py-3 text-muted-foreground">{p.data_inicio}</td>
+                <td className="px-4 py-3 text-muted-foreground">{p.data_prevista_fim}</td>
                 <td className="px-4 py-3">
                   <Badge variant={badgeVariant(p.status)}>{p.status}</Badge>
                 </td>

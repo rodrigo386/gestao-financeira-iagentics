@@ -30,7 +30,7 @@ export default async function EditarRegraPage({ params }: { params: Promise<{ id
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold">Editar regra</h1>
-      <p className="text-sm text-neutral-500 font-mono">{regra.pattern} ({regra.pattern_tipo})</p>
+      <p className="text-sm text-muted-foreground font-mono">{regra.pattern} ({regra.pattern_tipo})</p>
       <RegraForm
         initialData={{
           pattern: regra.pattern,

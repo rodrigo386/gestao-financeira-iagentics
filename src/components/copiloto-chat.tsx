@@ -43,16 +43,16 @@ export function CopilotoChat({ executarAcao }: Props) {
       <div className="space-y-3">
         {historico.map((m, i) => (
           <div key={i} className={m.role === 'user' ? 'text-right' : ''}>
-            <span className={`inline-block rounded-md px-3 py-2 text-sm ${m.role === 'user' ? 'bg-blue-50' : 'bg-neutral-100'}`}>{m.content}</span>
+            <span className={`inline-block rounded-md px-3 py-2 text-sm ${m.role === 'user' ? 'bg-primary/20' : 'bg-muted'}`}>{m.content}</span>
           </div>
         ))}
       </div>
 
       {proposta && (
-        <Card className="border-amber-300">
+        <Card className="border-amber-400/40">
           <CardContent className="pt-6 space-y-3">
             <div className="text-sm">O copiloto propõe a ação <strong>{proposta.tipo}</strong>:</div>
-            <pre className="text-xs bg-neutral-50 p-2 rounded overflow-auto">{JSON.stringify(proposta, null, 2)}</pre>
+            <pre className="text-xs bg-muted p-2 rounded overflow-auto">{JSON.stringify(proposta, null, 2)}</pre>
             <div className="flex gap-2">
               <Button size="sm" onClick={confirmar} disabled={carregando}>Confirmar</Button>
               <Button size="sm" variant="outline" onClick={() => setProposta(null)} disabled={carregando}>Cancelar</Button>

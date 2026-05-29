@@ -86,18 +86,18 @@ export default async function CorridasPage({
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold">Corridas de Folha</h1>
-          <p className="text-sm text-neutral-500">{folhas.length} corrida(s) em {ano}</p>
+          <p className="text-sm text-muted-foreground">{folhas.length} corrida(s) em {ano}</p>
         </div>
       </div>
 
       {/* Year filter */}
       <div className="flex items-center gap-2">
-        <span className="text-sm text-neutral-500">Ano:</span>
+        <span className="text-sm text-muted-foreground">Ano:</span>
         {anos.map((a) => (
           <Link
             key={a}
             href={`/folha/corridas?ano=${a}`}
-            className={`text-sm px-3 py-1 rounded-md border ${a === ano ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900' : 'border-neutral-200 hover:bg-neutral-50 dark:border-neutral-700 dark:hover:bg-neutral-800'}`}
+            className={`text-sm px-3 py-1 rounded-md border ${a === ano ? 'bg-foreground text-background' : 'border-border hover:bg-accent'}`}
           >
             {a}
           </Link>
@@ -105,11 +105,11 @@ export default async function CorridasPage({
       </div>
 
       {/* Abrir nova corrida form */}
-      <div className="border rounded-md p-4 bg-neutral-50 dark:bg-neutral-900">
+      <div className="border rounded-md p-4 bg-muted">
         <p className="text-sm font-medium mb-3">Abrir nova corrida</p>
         <form action={abrir} className="flex items-end gap-3">
           <div className="space-y-1">
-            <label htmlFor="mes_ref" className="text-xs text-neutral-500">
+            <label htmlFor="mes_ref" className="text-xs text-muted-foreground">
               Mes de referencia
             </label>
             <input
@@ -118,7 +118,7 @@ export default async function CorridasPage({
               name="mes_ref"
               required
               defaultValue={`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`}
-              className="border rounded-md px-3 py-2 text-sm bg-white dark:bg-neutral-800 dark:border-neutral-700"
+              className="border rounded-md px-3 py-2 text-sm bg-card border-border"
             />
           </div>
           <Button type="submit">Abrir corrida</Button>
@@ -127,11 +127,11 @@ export default async function CorridasPage({
 
       {/* Table */}
       {folhas.length === 0 ? (
-        <p className="text-sm text-neutral-500">Nenhuma corrida em {ano}.</p>
+        <p className="text-sm text-muted-foreground">Nenhuma corrida em {ano}.</p>
       ) : (
         <div className="border rounded-md overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-neutral-50 dark:bg-neutral-900 text-left">
+            <thead className="bg-muted text-left">
               <tr>
                 <th className="px-4 py-3">Mes Ref.</th>
                 <th className="px-4 py-3">Status</th>
@@ -151,8 +151,8 @@ export default async function CorridasPage({
                       {f.status === 'fechada' ? 'Fechada' : 'Aberta'}
                     </Badge>
                   </td>
-                  <td className="px-4 py-3 text-neutral-600">{formatDateTime(f.gerada_em)}</td>
-                  <td className="px-4 py-3 text-neutral-600">{formatDateTime(f.fechada_em)}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{formatDateTime(f.gerada_em)}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{formatDateTime(f.fechada_em)}</td>
                   <td className="px-4 py-3 text-right">{itemCountsMap[f.id] ?? 0}</td>
                   <td className="px-4 py-3 text-right">{formatBRL(totalBrutoMap[f.id] ?? 0)}</td>
                   <td className="px-4 py-3 text-right">

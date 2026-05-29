@@ -15,7 +15,7 @@ export default async function PJSpotPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold">PJ Spot</h1>
-          <p className="text-sm text-neutral-500">{total} prestador(es) cadastrados</p>
+          <p className="text-sm text-muted-foreground">{total} prestador(es) cadastrados</p>
         </div>
         <Link href="/folha/pj-spot/novo">
           <Button>Novo PJ Spot</Button>
@@ -24,7 +24,7 @@ export default async function PJSpotPage() {
 
       <div className="border rounded-md">
         <table className="w-full text-sm">
-          <thead className="bg-neutral-50 dark:bg-neutral-900 text-left">
+          <thead className="bg-muted text-left">
             <tr>
               <th className="px-4 py-3">Nome</th>
               <th className="px-4 py-3">Especialidade</th>
@@ -37,18 +37,18 @@ export default async function PJSpotPage() {
           <tbody>
             {data.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-6 text-center text-neutral-500">
+                <td colSpan={6} className="px-4 py-6 text-center text-muted-foreground">
                   Nenhum prestador cadastrado ainda.
                 </td>
               </tr>
             ) : data.map((p) => (
               <tr key={p.id} className="border-t">
                 <td className="px-4 py-3 font-medium">{p.nome}</td>
-                <td className="px-4 py-3 text-neutral-600">{p.especialidade ?? '—'}</td>
-                <td className="px-4 py-3 text-neutral-600">
+                <td className="px-4 py-3 text-muted-foreground">{p.especialidade ?? '—'}</td>
+                <td className="px-4 py-3 text-muted-foreground">
                   {p.valor_hora_padrao != null ? formatBRL(p.valor_hora_padrao) : '—'}
                 </td>
-                <td className="px-4 py-3 text-neutral-600">{p.contato_email ?? '—'}</td>
+                <td className="px-4 py-3 text-muted-foreground">{p.contato_email ?? '—'}</td>
                 <td className="px-4 py-3">
                   <Badge variant={p.ativo ? 'default' : 'secondary'}>{p.ativo ? 'Ativo' : 'Inativo'}</Badge>
                 </td>

@@ -61,7 +61,7 @@ export default async function DespesasPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm text-neutral-500">Total despesa do mês</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">Total despesa do mês</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-semibold">
@@ -71,7 +71,7 @@ export default async function DespesasPage() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm text-neutral-500">AP previsto (próximos 30d)</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">AP previsto (próximos 30d)</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-semibold">
@@ -81,17 +81,17 @@ export default async function DespesasPage() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm text-neutral-500">AP atrasado</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">AP atrasado</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className={`text-2xl font-semibold ${totalAtrasado > 0 ? 'text-red-700' : ''}`}>
+            <div className={`text-2xl font-semibold ${totalAtrasado > 0 ? 'text-rose-400' : ''}`}>
               R$ {totalAtrasado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm text-neutral-500">Fornecedores ativos</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">Fornecedores ativos</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-semibold">{fornecedoresAtivos ?? 0}</div>
@@ -101,7 +101,7 @@ export default async function DespesasPage() {
 
       <Card>
         <CardHeader><CardTitle>Próximos passos</CardTitle></CardHeader>
-        <CardContent className="text-sm text-neutral-600 space-y-1">
+        <CardContent className="text-sm text-muted-foreground space-y-1">
           <p>· <Link href="/despesas/fornecedores" className="underline">Cadastre fornecedores</Link> para vincular às despesas e APs</p>
           <p>· <Link href="/despesas/recorrentes" className="underline">Configure despesas recorrentes</Link> (aluguel, assinaturas, salários) para geração automática de APs</p>
           <p>· <Link href="/despesas/lancamentos" className="underline">Registre lançamentos</Link> de saída para acompanhar o fluxo real</p>

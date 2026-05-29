@@ -26,7 +26,7 @@ export default async function FluxoCaixaPage() {
 
       {/* Saldo por conta bancária */}
       {(contas ?? []).length === 0 ? (
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm text-muted-foreground">
           Cadastre uma conta bancária em Configurações para acompanhar o fluxo de caixa.
         </p>
       ) : (
@@ -34,14 +34,14 @@ export default async function FluxoCaixaPage() {
           {(contas ?? []).map((c) => (
             <Card key={c.id}>
               <CardHeader>
-                <CardTitle className="text-sm text-neutral-500">{c.banco}</CardTitle>
+                <CardTitle className="text-sm text-muted-foreground">{c.banco}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-semibold">
                   R$ {Number(c.saldo_atual).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </div>
                 {c.conta && (
-                  <div className="text-xs text-neutral-500 mt-1">{c.conta}</div>
+                  <div className="text-xs text-muted-foreground mt-1">{c.conta}</div>
                 )}
               </CardContent>
             </Card>
@@ -53,11 +53,11 @@ export default async function FluxoCaixaPage() {
       <div>
         <h2 className="text-lg font-medium mb-3">Lançamentos — últimos 90 dias</h2>
         {(lancs ?? []).length === 0 ? (
-          <p className="text-sm text-neutral-500">Nenhum lançamento nos últimos 90 dias.</p>
+          <p className="text-sm text-muted-foreground">Nenhum lançamento nos últimos 90 dias.</p>
         ) : (
           <div className="border rounded-md overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-neutral-50 text-left">
+              <thead className="bg-muted text-left">
                 <tr>
                   <th className="px-4 py-3">Data</th>
                   <th className="px-4 py-3">Descrição</th>
@@ -71,9 +71,9 @@ export default async function FluxoCaixaPage() {
                   <tr key={l.id} className="border-t">
                     <td className="px-4 py-3">{l.data}</td>
                     <td className="px-4 py-3">{l.descricao}</td>
-                    <td className="px-4 py-3 text-neutral-600">{(l.categoria as { nome?: string } | null)?.nome ?? '—'}</td>
-                    <td className="px-4 py-3 text-neutral-600">{(l.conta as { banco?: string } | null)?.banco ?? '—'}</td>
-                    <td className={`px-4 py-3 text-right font-medium ${l.tipo === 'entrada' ? 'text-green-700' : 'text-red-700'}`}>
+                    <td className="px-4 py-3 text-muted-foreground">{(l.categoria as { nome?: string } | null)?.nome ?? '—'}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{(l.conta as { banco?: string } | null)?.banco ?? '—'}</td>
+                    <td className={`px-4 py-3 text-right font-medium ${l.tipo === 'entrada' ? 'text-emerald-400' : 'text-rose-400'}`}>
                       {l.tipo === 'entrada' ? '+' : '-'} R$ {Number(l.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </td>
                   </tr>

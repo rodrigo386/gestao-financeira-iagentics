@@ -11,7 +11,7 @@ export default async function ClientesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold">Clientes</h1>
-          <p className="text-sm text-neutral-500">{total} cliente(s) cadastrados</p>
+          <p className="text-sm text-muted-foreground">{total} cliente(s) cadastrados</p>
         </div>
         <Link href="/receitas/clientes/novo">
           <Button>Novo cliente</Button>
@@ -20,7 +20,7 @@ export default async function ClientesPage() {
 
       <div className="border rounded-md">
         <table className="w-full text-sm">
-          <thead className="bg-neutral-50 dark:bg-neutral-900 text-left">
+          <thead className="bg-muted text-left">
             <tr>
               <th className="px-4 py-3">Nome</th>
               <th className="px-4 py-3">CNPJ</th>
@@ -32,15 +32,15 @@ export default async function ClientesPage() {
           <tbody>
             {data.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-neutral-500">
+                <td colSpan={5} className="px-4 py-6 text-center text-muted-foreground">
                   Nenhum cliente cadastrado ainda.
                 </td>
               </tr>
             ) : data.map((c) => (
               <tr key={c.id} className="border-t">
                 <td className="px-4 py-3 font-medium">{c.nome}</td>
-                <td className="px-4 py-3 text-neutral-600">{c.cnpj ?? '—'}</td>
-                <td className="px-4 py-3 text-neutral-600">{c.segmento ?? '—'}</td>
+                <td className="px-4 py-3 text-muted-foreground">{c.cnpj ?? '—'}</td>
+                <td className="px-4 py-3 text-muted-foreground">{c.segmento ?? '—'}</td>
                 <td className="px-4 py-3">
                   <Badge variant={c.status === 'ativo' ? 'default' : 'secondary'}>{c.status}</Badge>
                 </td>

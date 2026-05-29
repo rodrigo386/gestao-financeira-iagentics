@@ -31,26 +31,26 @@ export default async function ReceitasPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
-          <CardHeader><CardTitle className="text-sm text-neutral-500">MRR</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-sm text-muted-foreground">MRR</CardTitle></CardHeader>
           <CardContent><div className="text-2xl font-semibold">R$ {mrr.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div></CardContent>
         </Card>
         <Card>
-          <CardHeader><CardTitle className="text-sm text-neutral-500">ARR</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-sm text-muted-foreground">ARR</CardTitle></CardHeader>
           <CardContent><div className="text-2xl font-semibold">R$ {arr.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div></CardContent>
         </Card>
         <Card>
-          <CardHeader><CardTitle className="text-sm text-neutral-500">Contratos ativos</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-sm text-muted-foreground">Contratos ativos</CardTitle></CardHeader>
           <CardContent><div className="text-2xl font-semibold">{ativos}</div></CardContent>
         </Card>
         <Card>
-          <CardHeader><CardTitle className="text-sm text-neutral-500">Projetos ativos</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-sm text-muted-foreground">Projetos ativos</CardTitle></CardHeader>
           <CardContent><div className="text-2xl font-semibold">{projetosAtivos}</div></CardContent>
         </Card>
       </div>
 
       <Card>
         <CardHeader><CardTitle>Próximos passos</CardTitle></CardHeader>
-        <CardContent className="text-sm text-neutral-600 space-y-1">
+        <CardContent className="text-sm text-muted-foreground space-y-1">
           <p>· <Link href="/receitas/clientes" className="underline">Cadastre clientes</Link></p>
           <p>· <Link href="/receitas/contratos" className="underline">Adicione contratos AaaS</Link> para começar a ter MRR</p>
           <p>· <Link href="/receitas/projetos" className="underline">Crie projetos</Link> com milestones para faturamento por etapa</p>

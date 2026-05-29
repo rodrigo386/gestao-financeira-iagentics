@@ -23,7 +23,7 @@ export default async function ContratosPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold">Contratos</h1>
-          <p className="text-sm text-neutral-500">{contratos.length} contrato(s) cadastrados</p>
+          <p className="text-sm text-muted-foreground">{contratos.length} contrato(s) cadastrados</p>
         </div>
         <Link href="/receitas/contratos/novo">
           <Button>Novo contrato</Button>
@@ -32,7 +32,7 @@ export default async function ContratosPage() {
 
       <div className="border rounded-md">
         <table className="w-full text-sm">
-          <thead className="bg-neutral-50 dark:bg-neutral-900 text-left">
+          <thead className="bg-muted text-left">
             <tr>
               <th className="px-4 py-3">Cliente</th>
               <th className="px-4 py-3">Nome</th>
@@ -45,16 +45,16 @@ export default async function ContratosPage() {
           <tbody>
             {contratos.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-6 text-center text-neutral-500">
+                <td colSpan={6} className="px-4 py-6 text-center text-muted-foreground">
                   Nenhum contrato cadastrado ainda.
                 </td>
               </tr>
             ) : contratos.map((c) => (
               <tr key={c.id} className="border-t">
-                <td className="px-4 py-3 text-neutral-600">{clienteMap.get(c.cliente_id) ?? '—'}</td>
+                <td className="px-4 py-3 text-muted-foreground">{clienteMap.get(c.cliente_id) ?? '—'}</td>
                 <td className="px-4 py-3 font-medium">{c.nome}</td>
-                <td className="px-4 py-3 text-neutral-600">{c.tipo}</td>
-                <td className="px-4 py-3 text-neutral-600">
+                <td className="px-4 py-3 text-muted-foreground">{c.tipo}</td>
+                <td className="px-4 py-3 text-muted-foreground">
                   R$ {c.ticket.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </td>
                 <td className="px-4 py-3">

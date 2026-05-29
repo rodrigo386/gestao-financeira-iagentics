@@ -54,7 +54,7 @@ export default function LoginPage() {
               <Button type="submit" className="w-full" disabled={status === 'sending'}>
                 {status === 'sending' ? 'Enviando...' : 'Enviar link de acesso'}
               </Button>
-              {errMsg && <p className="text-sm text-red-600">{errMsg}</p>}
+              {errMsg && <p className="text-sm text-destructive">{errMsg}</p>}
             </form>
           )}
         </CardContent>

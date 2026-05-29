@@ -64,13 +64,13 @@ export default async function PendenciasPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold">Pendências de Categorização</h1>
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm text-muted-foreground">
           Lançamentos sem categoria ou com baixa confiança do LLM (&lt;70%)
         </p>
       </div>
 
       {!lancamentos || lancamentos.length === 0 ? (
-        <div className="border rounded-md px-4 py-10 text-center text-neutral-500">
+        <div className="border rounded-md px-4 py-10 text-center text-muted-foreground">
           Nenhuma pendência. Tudo categorizado.
         </div>
       ) : (

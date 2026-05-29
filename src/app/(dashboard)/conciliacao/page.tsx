@@ -84,19 +84,19 @@ export default async function ConciliacaoPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold">Conciliação — Sugestões Pendentes</h1>
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm text-muted-foreground">
           {sugestoes?.length ?? 0} sugestão(ões) aguardando revisão
         </p>
       </div>
 
       {!sugestoes || sugestoes.length === 0 ? (
-        <div className="border rounded-md px-4 py-10 text-center text-neutral-500">
+        <div className="border rounded-md px-4 py-10 text-center text-muted-foreground">
           Nenhuma sugestão pendente.
         </div>
       ) : (
         <div className="border rounded-md">
           <table className="w-full text-sm">
-            <thead className="bg-neutral-50 dark:bg-neutral-900 text-left">
+            <thead className="bg-muted text-left">
               <tr>
                 <th className="px-4 py-3">Lançamento</th>
                 <th className="px-4 py-3">Candidato</th>
@@ -124,26 +124,26 @@ export default async function ConciliacaoPage() {
                     <td className="px-4 py-3">
                       {lanc ? (
                         <div>
-                          <div className="text-xs text-neutral-500">{lanc.data}</div>
+                          <div className="text-xs text-muted-foreground">{lanc.data}</div>
                           <div className="font-medium truncate max-w-[180px]">{lanc.descricao}</div>
-                          <div className={`text-sm font-semibold ${isEntrada ? 'text-green-600' : 'text-red-600'}`}>
+                          <div className={`text-sm font-semibold ${isEntrada ? 'text-emerald-400' : 'text-rose-400'}`}>
                             {isEntrada ? '+' : '-'} R$ {Number(lanc.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                           </div>
                         </div>
                       ) : (
-                        <span className="text-neutral-400">—</span>
+                        <span className="text-muted-foreground">—</span>
                       )}
                     </td>
                     <td className="px-4 py-3">
                       {s.candidato_id ? (
                         <a
                           href={`${apArPath}/${s.candidato_id}`}
-                          className="text-sm underline text-blue-600"
+                          className="text-sm underline text-primary hover:underline"
                         >
                           {s.candidato_tipo?.toUpperCase()} {s.candidato_id.slice(0, 8)}…
                         </a>
                       ) : (
-                        <span className="text-neutral-400">Sem candidato</span>
+                        <span className="text-muted-foreground">Sem candidato</span>
                       )}
                     </td>
                     <td className="px-4 py-3">
@@ -152,7 +152,7 @@ export default async function ConciliacaoPage() {
                     <td className="px-4 py-3">
                       {Math.round(Number(s.score) * 100)}%
                     </td>
-                    <td className="px-4 py-3 text-neutral-600 text-xs max-w-[200px]">
+                    <td className="px-4 py-3 text-muted-foreground text-xs max-w-[200px]">
                       {s.explicacao ?? '—'}
                     </td>
                     <td className="px-4 py-3">

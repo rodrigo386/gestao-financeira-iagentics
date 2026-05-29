@@ -64,14 +64,14 @@ export default async function BancosPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold">Bancos conectados</h1>
-          <p className="text-sm text-neutral-500">{items?.length ?? 0} item(s) cadastrado(s)</p>
+          <p className="text-sm text-muted-foreground">{items?.length ?? 0} item(s) cadastrado(s)</p>
         </div>
         <div className="flex items-center gap-3">
           <a
             href="https://my.pluggy.ai"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm underline text-neutral-600"
+            className="text-sm underline text-primary hover:underline"
           >
             Conectar novo banco (Pluggy)
           </a>
@@ -85,7 +85,7 @@ export default async function BancosPage() {
 
       <div className="border rounded-md">
         <table className="w-full text-sm">
-          <thead className="bg-neutral-50 dark:bg-neutral-900 text-left">
+          <thead className="bg-muted text-left">
             <tr>
               <th className="px-4 py-3">Banco</th>
               <th className="px-4 py-3">Pluggy Item ID</th>
@@ -98,7 +98,7 @@ export default async function BancosPage() {
           <tbody>
             {!items || items.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-6 text-center text-neutral-500">
+                <td colSpan={6} className="px-4 py-6 text-center text-muted-foreground">
                   Nenhum banco conectado.{isMock && " (Em desenvolvimento, use 'Adicionar item mock')."}
                 </td>
               </tr>
@@ -106,22 +106,22 @@ export default async function BancosPage() {
               items.map((item) => (
                 <tr key={item.id} className="border-t">
                   <td className="px-4 py-3 font-medium">{item.banco_nome}</td>
-                  <td className="px-4 py-3 font-mono text-xs text-neutral-500">
+                  <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
                     {item.pluggy_item_id.length > 20
                       ? `${item.pluggy_item_id.slice(0, 20)}…`
                       : item.pluggy_item_id}
                   </td>
                   <td className="px-4 py-3">
                     {item.conta_bancaria ? (
-                      <span className="text-neutral-700">{(item.conta_bancaria as { id: string; nome: string }).nome}</span>
+                      <span className="text-foreground">{(item.conta_bancaria as { id: string; nome: string }).nome}</span>
                     ) : (
-                      <span className="text-neutral-400">—</span>
+                      <span className="text-muted-foreground">—</span>
                     )}
                   </td>
                   <td className="px-4 py-3">
                     <StatusBadge status={item.status} />
                   </td>
-                  <td className="px-4 py-3 text-neutral-500">
+                  <td className="px-4 py-3 text-muted-foreground">
                     {item.last_synced_at
                       ? new Date(item.last_synced_at).toLocaleString('pt-BR')
                       : '—'}

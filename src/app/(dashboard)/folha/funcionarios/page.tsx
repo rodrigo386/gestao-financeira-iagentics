@@ -15,7 +15,7 @@ export default async function FuncionariosPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold">Funcionários</h1>
-          <p className="text-sm text-neutral-500">{total} funcionário(s) cadastrados</p>
+          <p className="text-sm text-muted-foreground">{total} funcionário(s) cadastrados</p>
         </div>
         <Link href="/folha/funcionarios/novo">
           <Button>Novo funcionário</Button>
@@ -24,7 +24,7 @@ export default async function FuncionariosPage() {
 
       <div className="border rounded-md">
         <table className="w-full text-sm">
-          <thead className="bg-neutral-50 dark:bg-neutral-900 text-left">
+          <thead className="bg-muted text-left">
             <tr>
               <th className="px-4 py-3">Nome</th>
               <th className="px-4 py-3">Cargo</th>
@@ -37,18 +37,18 @@ export default async function FuncionariosPage() {
           <tbody>
             {data.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-6 text-center text-neutral-500">
+                <td colSpan={6} className="px-4 py-6 text-center text-muted-foreground">
                   Nenhum funcionário cadastrado ainda.
                 </td>
               </tr>
             ) : data.map((f) => (
               <tr key={f.id} className="border-t">
                 <td className="px-4 py-3 font-medium">{f.nome}</td>
-                <td className="px-4 py-3 text-neutral-600">{f.cargo}</td>
+                <td className="px-4 py-3 text-muted-foreground">{f.cargo}</td>
                 <td className="px-4 py-3">
                   <Badge variant="outline">{f.tipo === 'clt' ? 'CLT' : 'PJ Recorrente'}</Badge>
                 </td>
-                <td className="px-4 py-3 text-neutral-600">{formatBRL(f.salario_base)}</td>
+                <td className="px-4 py-3 text-muted-foreground">{formatBRL(f.salario_base)}</td>
                 <td className="px-4 py-3">
                   <Badge variant={f.ativo ? 'default' : 'secondary'}>{f.ativo ? 'Ativo' : 'Inativo'}</Badge>
                 </td>

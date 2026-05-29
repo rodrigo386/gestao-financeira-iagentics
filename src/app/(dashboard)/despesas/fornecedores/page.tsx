@@ -18,7 +18,7 @@ export default async function FornecedoresPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold">Fornecedores</h1>
-          <p className="text-sm text-neutral-500">{fornecedores.length} fornecedor(es) cadastrados</p>
+          <p className="text-sm text-muted-foreground">{fornecedores.length} fornecedor(es) cadastrados</p>
         </div>
         <Link href="/despesas/fornecedores/novo">
           <Button>Novo fornecedor</Button>
@@ -27,7 +27,7 @@ export default async function FornecedoresPage() {
 
       <div className="border rounded-md">
         <table className="w-full text-sm">
-          <thead className="bg-neutral-50 dark:bg-neutral-900 text-left">
+          <thead className="bg-muted text-left">
             <tr>
               <th className="px-4 py-3">Nome</th>
               <th className="px-4 py-3">CNPJ</th>
@@ -39,15 +39,15 @@ export default async function FornecedoresPage() {
           <tbody>
             {fornecedores.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-neutral-500">
+                <td colSpan={5} className="px-4 py-6 text-center text-muted-foreground">
                   Nenhum fornecedor cadastrado ainda.
                 </td>
               </tr>
             ) : fornecedores.map((f) => (
               <tr key={f.id} className="border-t">
                 <td className="px-4 py-3 font-medium">{f.nome}</td>
-                <td className="px-4 py-3 text-neutral-600">{f.cnpj ?? '—'}</td>
-                <td className="px-4 py-3 text-neutral-600">
+                <td className="px-4 py-3 text-muted-foreground">{f.cnpj ?? '—'}</td>
+                <td className="px-4 py-3 text-muted-foreground">
                   {f.categoria_default_id ? (categoriaMap.get(f.categoria_default_id) ?? '—') : '—'}
                 </td>
                 <td className="px-4 py-3">

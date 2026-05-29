@@ -52,7 +52,7 @@ export function AlocacaoForm({ pjId, projetos, onSubmit }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 border rounded-md p-4 bg-neutral-50 dark:bg-neutral-900">
+    <form onSubmit={handleSubmit} className="space-y-4 border rounded-md p-4 bg-muted">
       <h3 className="font-medium text-sm">Nova Alocação</h3>
       <div className="space-y-2">
         <Label htmlFor="descricao">Descrição *</Label>
@@ -125,7 +125,7 @@ export function AlocacaoForm({ pjId, projetos, onSubmit }: Props) {
             onChange={(e) => setData({ ...data, data_prevista_fim: e.target.value })} />
         </div>
       </div>
-      {err && <p className="text-sm text-red-600">{err}</p>}
+      {err && <p className="text-sm text-destructive">{err}</p>}
       <Button type="submit" size="sm" disabled={submitting}>
         {submitting ? 'Criando...' : 'Criar alocação'}
       </Button>

@@ -15,13 +15,13 @@ export default async function FornecedorDetailPage({ params }: { params: Promise
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-semibold">{fornecedor.nome}</h1>
-        <div className="flex gap-4 text-sm text-neutral-600 mt-2 flex-wrap">
+        <div className="flex gap-4 text-sm text-muted-foreground mt-2 flex-wrap">
           {fornecedor.cnpj && <span>CNPJ: {fornecedor.cnpj}</span>}
           <Badge variant={fornecedor.ativo ? 'default' : 'secondary'}>{fornecedor.ativo ? 'ativo' : 'inativo'}</Badge>
         </div>
         {fornecedor.contato_email && <p className="mt-2 text-sm">Email: {fornecedor.contato_email}</p>}
         {fornecedor.contato_telefone && <p className="text-sm">Telefone: {fornecedor.contato_telefone}</p>}
-        {fornecedor.observacoes && <p className="mt-2 text-sm text-neutral-600">{fornecedor.observacoes}</p>}
+        {fornecedor.observacoes && <p className="mt-2 text-sm text-muted-foreground">{fornecedor.observacoes}</p>}
       </div>
 
       <section>
@@ -30,11 +30,11 @@ export default async function FornecedorDetailPage({ params }: { params: Promise
           <Link href={`/despesas/recorrentes/novo?fornecedor=${id}`} className="text-sm underline">+ Nova recorrente</Link>
         </div>
         {recorrentes.length === 0 ? (
-          <p className="text-sm text-neutral-500">Nenhuma despesa recorrente vinculada.</p>
+          <p className="text-sm text-muted-foreground">Nenhuma despesa recorrente vinculada.</p>
         ) : (
           <div className="border rounded-md">
             <table className="w-full text-sm">
-              <thead className="bg-neutral-50 dark:bg-neutral-900 text-left">
+              <thead className="bg-muted text-left">
                 <tr>
                   <th className="px-4 py-3">Descrição</th>
                   <th className="px-4 py-3">Valor</th>

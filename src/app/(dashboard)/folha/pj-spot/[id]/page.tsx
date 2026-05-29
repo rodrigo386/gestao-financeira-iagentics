@@ -61,7 +61,7 @@ export default async function PJSpotDetailPage({ params }: Props) {
         <h1 className="text-2xl font-semibold">{pj.nome}</h1>
         <div className="flex gap-3 items-center mt-2">
           <Badge variant={pj.ativo ? 'default' : 'secondary'}>{pj.ativo ? 'Ativo' : 'Inativo'}</Badge>
-          {pj.especialidade && <span className="text-sm text-neutral-500">{pj.especialidade}</span>}
+          {pj.especialidade && <span className="text-sm text-muted-foreground">{pj.especialidade}</span>}
         </div>
       </div>
 
@@ -71,19 +71,19 @@ export default async function PJSpotDetailPage({ params }: Props) {
           <CardContent className="space-y-2 text-sm">
             {pj.cpf_cnpj && (
               <div className="flex justify-between">
-                <span className="text-neutral-500">CPF/CNPJ</span>
+                <span className="text-muted-foreground">CPF/CNPJ</span>
                 <span>{pj.cpf_cnpj}</span>
               </div>
             )}
             {pj.contato_email && (
               <div className="flex justify-between">
-                <span className="text-neutral-500">Email</span>
+                <span className="text-muted-foreground">Email</span>
                 <span>{pj.contato_email}</span>
               </div>
             )}
             {pj.contato_telefone && (
               <div className="flex justify-between">
-                <span className="text-neutral-500">Telefone</span>
+                <span className="text-muted-foreground">Telefone</span>
                 <span>{pj.contato_telefone}</span>
               </div>
             )}
@@ -94,7 +94,7 @@ export default async function PJSpotDetailPage({ params }: Props) {
           <CardHeader><CardTitle>Financeiro</CardTitle></CardHeader>
           <CardContent className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-neutral-500">Valor/Hora Padrão</span>
+              <span className="text-muted-foreground">Valor/Hora Padrão</span>
               <span className="font-medium">
                 {pj.valor_hora_padrao != null ? formatBRL(pj.valor_hora_padrao) : '—'}
               </span>
@@ -107,11 +107,11 @@ export default async function PJSpotDetailPage({ params }: Props) {
       <section className="space-y-4">
         <h2 className="text-lg font-medium">Alocações ({alocacoes.length})</h2>
         {alocacoes.length === 0 ? (
-          <p className="text-sm text-neutral-500">Nenhuma alocação registrada.</p>
+          <p className="text-sm text-muted-foreground">Nenhuma alocação registrada.</p>
         ) : (
           <div className="border rounded-md">
             <table className="w-full text-sm">
-              <thead className="bg-neutral-50 dark:bg-neutral-900 text-left">
+              <thead className="bg-muted text-left">
                 <tr>
                   <th className="px-4 py-3">Descrição</th>
                   <th className="px-4 py-3">Tipo</th>
@@ -125,12 +125,12 @@ export default async function PJSpotDetailPage({ params }: Props) {
                 {alocacoes.map((a) => (
                   <tr key={a.id} className="border-t">
                     <td className="px-4 py-3 font-medium">{a.descricao}</td>
-                    <td className="px-4 py-3 text-neutral-600">{a.tipo_remuneracao}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{a.tipo_remuneracao}</td>
                     <td className="px-4 py-3">{formatBRL(a.valor_total)}</td>
                     <td className="px-4 py-3">
                       <Badge variant={STATUS_VARIANT[a.status] ?? 'outline'}>{a.status}</Badge>
                     </td>
-                    <td className="px-4 py-3 text-neutral-600 text-xs">
+                    <td className="px-4 py-3 text-muted-foreground text-xs">
                       {a.data_inicio} → {a.data_prevista_fim}
                     </td>
                     <td className="px-4 py-3 text-right">
@@ -141,7 +141,7 @@ export default async function PJSpotDetailPage({ params }: Props) {
                         }}>
                           <button
                             type="submit"
-                            className="text-xs underline text-blue-600 hover:text-blue-800"
+                            className="text-xs underline text-primary hover:underline"
                           >
                             Faturar (gerar AP)
                           </button>

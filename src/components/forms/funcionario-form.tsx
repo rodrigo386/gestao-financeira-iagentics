@@ -257,7 +257,7 @@ export function FuncionarioForm({ initialData, onSubmit, submitLabel = 'Salvar' 
         </CardContent>
       </Card>
 
-      {err && <p className="text-sm text-red-600">{err}</p>}
+      {err && <p className="text-sm text-destructive">{err}</p>}
       <Button type="submit" disabled={submitting}>
         {submitting ? 'Salvando...' : submitLabel}
       </Button>

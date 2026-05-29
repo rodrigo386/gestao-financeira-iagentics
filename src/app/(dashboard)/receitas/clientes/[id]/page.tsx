@@ -18,7 +18,7 @@ export default async function ClienteDetailPage({ params }: { params: Promise<{ 
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-semibold">{cliente.nome}</h1>
-        <div className="flex gap-4 text-sm text-neutral-600 mt-2">
+        <div className="flex gap-4 text-sm text-muted-foreground mt-2">
           {cliente.cnpj && <span>CNPJ: {cliente.cnpj}</span>}
           {cliente.segmento && <span>Segmento: {cliente.segmento}</span>}
           <Badge variant={cliente.status === 'ativo' ? 'default' : 'secondary'}>{cliente.status}</Badge>
@@ -32,7 +32,7 @@ export default async function ClienteDetailPage({ params }: { params: Promise<{ 
           <Link href={`/receitas/contratos/novo?cliente=${id}`} className="text-sm underline">+ Novo contrato</Link>
         </div>
         {contratos.length === 0 ? (
-          <p className="text-sm text-neutral-500">Sem contratos.</p>
+          <p className="text-sm text-muted-foreground">Sem contratos.</p>
         ) : (
           <ul className="space-y-2">
             {contratos.map((c) => (
@@ -40,7 +40,7 @@ export default async function ClienteDetailPage({ params }: { params: Promise<{ 
                 <div className="flex justify-between">
                   <div>
                     <Link href={`/receitas/contratos/${c.id}`} className="font-medium underline">{c.nome}</Link>
-                    <div className="text-xs text-neutral-500">{c.tipo} · R$ {c.ticket} · desde {c.data_inicio}</div>
+                    <div className="text-xs text-muted-foreground">{c.tipo} · R$ {c.ticket} · desde {c.data_inicio}</div>
                   </div>
                   <Badge variant={c.status === 'ativo' ? 'default' : 'secondary'}>{c.status}</Badge>
                 </div>
@@ -56,7 +56,7 @@ export default async function ClienteDetailPage({ params }: { params: Promise<{ 
           <Link href={`/receitas/projetos/novo?cliente=${id}`} className="text-sm underline">+ Novo projeto</Link>
         </div>
         {projetos.length === 0 ? (
-          <p className="text-sm text-neutral-500">Sem projetos.</p>
+          <p className="text-sm text-muted-foreground">Sem projetos.</p>
         ) : (
           <ul className="space-y-2">
             {projetos.map((p) => (
@@ -64,7 +64,7 @@ export default async function ClienteDetailPage({ params }: { params: Promise<{ 
                 <div className="flex justify-between">
                   <div>
                     <Link href={`/receitas/projetos/${p.id}`} className="font-medium underline">{p.nome}</Link>
-                    <div className="text-xs text-neutral-500">R$ {p.valor_total} · {p.data_inicio} → {p.data_prevista_fim}</div>
+                    <div className="text-xs text-muted-foreground">R$ {p.valor_total} · {p.data_inicio} → {p.data_prevista_fim}</div>
                   </div>
                   <Badge variant={p.status === 'ativo' ? 'default' : 'secondary'}>{p.status}</Badge>
                 </div>

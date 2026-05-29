@@ -48,7 +48,7 @@ export default async function ProjetoDetailPage({ params }: { params: Promise<{ 
           <Badge variant={badgeVariant(projeto.status)}>{projeto.status}</Badge>
         </div>
         {cliente && (
-          <p className="mt-1 text-sm text-neutral-600">
+          <p className="mt-1 text-sm text-muted-foreground">
             Cliente:{' '}
             <Link href={`/receitas/clientes/${cliente.id}`} className="underline">
               {cliente.nome}
@@ -60,38 +60,38 @@ export default async function ProjetoDetailPage({ params }: { params: Promise<{ 
       {/* Details */}
       <div className="grid grid-cols-2 gap-6 max-w-2xl text-sm">
         <div>
-          <p className="text-neutral-500">Valor total</p>
+          <p className="text-muted-foreground">Valor total</p>
           <p className="font-medium">
             R$ {projeto.valor_total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
           </p>
         </div>
         <div>
-          <p className="text-neutral-500">Moeda</p>
+          <p className="text-muted-foreground">Moeda</p>
           <p className="font-medium">{projeto.moeda}</p>
         </div>
         <div>
-          <p className="text-neutral-500">Data início</p>
+          <p className="text-muted-foreground">Data início</p>
           <p className="font-medium">{projeto.data_inicio}</p>
         </div>
         <div>
-          <p className="text-neutral-500">Previsão de fim</p>
+          <p className="text-muted-foreground">Previsão de fim</p>
           <p className="font-medium">{projeto.data_prevista_fim}</p>
         </div>
         {projeto.data_real_fim && (
           <div>
-            <p className="text-neutral-500">Conclusão real</p>
+            <p className="text-muted-foreground">Conclusão real</p>
             <p className="font-medium">{projeto.data_real_fim}</p>
           </div>
         )}
         {projeto.descricao && (
           <div className="col-span-2">
-            <p className="text-neutral-500">Descrição</p>
+            <p className="text-muted-foreground">Descrição</p>
             <p className="font-medium">{projeto.descricao}</p>
           </div>
         )}
         {projeto.observacoes && (
           <div className="col-span-2">
-            <p className="text-neutral-500">Observações</p>
+            <p className="text-muted-foreground">Observações</p>
             <p className="font-medium">{projeto.observacoes}</p>
           </div>
         )}
@@ -103,7 +103,7 @@ export default async function ProjetoDetailPage({ params }: { params: Promise<{ 
 
         <div className="border rounded-md mb-6">
           <table className="w-full text-sm">
-            <thead className="bg-neutral-50 dark:bg-neutral-900 text-left">
+            <thead className="bg-muted text-left">
               <tr>
                 <th className="px-4 py-3">Ordem</th>
                 <th className="px-4 py-3">Descrição</th>
@@ -115,18 +115,18 @@ export default async function ProjetoDetailPage({ params }: { params: Promise<{ 
             <tbody>
               {milestones.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-6 text-center text-neutral-500">
+                  <td colSpan={5} className="px-4 py-6 text-center text-muted-foreground">
                     Nenhum milestone ainda.
                   </td>
                 </tr>
               ) : milestones.map((m) => (
                 <tr key={m.id} className="border-t">
-                  <td className="px-4 py-3 text-neutral-600">{m.ordem}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{m.ordem}</td>
                   <td className="px-4 py-3 font-medium">{m.descricao}</td>
-                  <td className="px-4 py-3 text-neutral-600">
+                  <td className="px-4 py-3 text-muted-foreground">
                     R$ {m.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                   </td>
-                  <td className="px-4 py-3 text-neutral-600">{m.data_prevista}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{m.data_prevista}</td>
                   <td className="px-4 py-3">
                     <Badge variant={milestoneBadgeVariant(m.status)}>{m.status}</Badge>
                   </td>

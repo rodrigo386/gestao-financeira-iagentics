@@ -11,7 +11,7 @@ export default async function RecorrentesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold">Despesas recorrentes</h1>
-          <p className="text-sm text-neutral-500">{recorrentes.length} recorrente(s) cadastradas</p>
+          <p className="text-sm text-muted-foreground">{recorrentes.length} recorrente(s) cadastradas</p>
         </div>
         <Link href="/despesas/recorrentes/novo">
           <Button>Nova recorrente</Button>
@@ -20,7 +20,7 @@ export default async function RecorrentesPage() {
 
       <div className="border rounded-md">
         <table className="w-full text-sm">
-          <thead className="bg-neutral-50 dark:bg-neutral-900 text-left">
+          <thead className="bg-muted text-left">
             <tr>
               <th className="px-4 py-3">Descrição</th>
               <th className="px-4 py-3">Fornecedor</th>
@@ -34,7 +34,7 @@ export default async function RecorrentesPage() {
           <tbody>
             {recorrentes.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-4 py-6 text-center text-neutral-500">
+                <td colSpan={7} className="px-4 py-6 text-center text-muted-foreground">
                   Nenhuma despesa recorrente cadastrada ainda.
                 </td>
               </tr>
@@ -43,7 +43,7 @@ export default async function RecorrentesPage() {
               return (
                 <tr key={r.id} className="border-t">
                   <td className="px-4 py-3 font-medium">{r.descricao}</td>
-                  <td className="px-4 py-3 text-neutral-600">{row.fornecedor?.nome ?? '—'}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{row.fornecedor?.nome ?? '—'}</td>
                   <td className="px-4 py-3">R$ {r.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
                   <td className="px-4 py-3">{r.dia_mes}</td>
                   <td className="px-4 py-3">{r.proxima_geracao}</td>

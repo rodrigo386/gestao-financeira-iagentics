@@ -139,7 +139,7 @@ export default async function CorridaDetailPage({
             {folha.status === 'fechada' ? 'Fechada' : 'Aberta'}
           </Badge>
         </div>
-        <div className="text-sm text-neutral-500 space-x-4">
+        <div className="text-sm text-muted-foreground space-x-4">
           <span>Gerada em: {formatDateTime(folha.gerada_em)}</span>
           {folha.fechada_em && (
             <span>Fechada em: {formatDateTime(folha.fechada_em)}</span>
@@ -149,7 +149,7 @@ export default async function CorridaDetailPage({
           )}
         </div>
         <div className="pt-1">
-          <Link href="/folha/corridas" className="text-sm underline text-neutral-500">
+          <Link href="/folha/corridas" className="text-sm underline text-muted-foreground">
             ← Voltar para corridas
           </Link>
         </div>
@@ -157,11 +157,11 @@ export default async function CorridaDetailPage({
 
       {/* Items table */}
       {items.length === 0 ? (
-        <p className="text-sm text-neutral-500">Nenhum item nesta corrida (sem funcionarios ativos).</p>
+        <p className="text-sm text-muted-foreground">Nenhum item nesta corrida (sem funcionarios ativos).</p>
       ) : (
         <div className="border rounded-md overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-neutral-50 dark:bg-neutral-900 text-left">
+            <thead className="bg-muted text-left">
               <tr>
                 <th className="px-3 py-3 whitespace-nowrap">Funcionario</th>
                 <th className="px-3 py-3 whitespace-nowrap">Cargo</th>
@@ -184,7 +184,7 @@ export default async function CorridaDetailPage({
                   <td className="px-3 py-3 font-medium whitespace-nowrap">
                     {item.funcionario?.nome ?? '—'}
                   </td>
-                  <td className="px-3 py-3 text-neutral-600 whitespace-nowrap">
+                  <td className="px-3 py-3 text-muted-foreground whitespace-nowrap">
                     {item.funcionario?.cargo ?? '—'}
                   </td>
                   <td className="px-3 py-3 text-right whitespace-nowrap">{formatBRL(item.salario_bruto)}</td>
@@ -208,7 +208,7 @@ export default async function CorridaDetailPage({
                         PDF
                       </a>
                     ) : (
-                      <span className="text-neutral-400">—</span>
+                      <span className="text-muted-foreground">—</span>
                     )}
                   </td>
                 </tr>
@@ -216,7 +216,7 @@ export default async function CorridaDetailPage({
             </tbody>
             {/* Totals row */}
             <tfoot>
-              <tr className="border-t bg-neutral-50 dark:bg-neutral-900 font-medium">
+              <tr className="border-t bg-muted font-medium">
                 <td className="px-3 py-3" colSpan={2}>
                   Total ({items.length} funcionario(s))
                 </td>
@@ -241,7 +241,7 @@ export default async function CorridaDetailPage({
       {folha.status === 'aberta' && items.length > 0 && (
         <div className="flex justify-end">
           <div className="space-y-3 text-right max-w-md">
-            <p className="text-sm text-neutral-500">
+            <p className="text-sm text-muted-foreground">
               Ao fechar, serao gerados aproximadamente {numAPs} APs de pagamento e os holerites PDF serao criados.
               A acao e irreversivel.
             </p>

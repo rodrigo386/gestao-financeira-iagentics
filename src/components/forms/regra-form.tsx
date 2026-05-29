@@ -136,7 +136,7 @@ export function RegraForm({ initialData, onSubmit, submitLabel = 'Salvar', categ
             <Label htmlFor="ativa">Ativa</Label>
           </div>
 
-          {err && <p className="text-sm text-red-600">{err}</p>}
+          {err && <p className="text-sm text-destructive">{err}</p>}
           <Button type="submit" disabled={submitting}>
             {submitting ? 'Salvando...' : submitLabel}
           </Button>

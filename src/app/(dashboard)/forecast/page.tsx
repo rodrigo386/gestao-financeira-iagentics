@@ -58,7 +58,7 @@ export default async function ForecastPage() {
           <Card key={c.id}>
             <CardHeader><CardTitle>{c.nome}</CardTitle></CardHeader>
             <CardContent>
-              <div className="text-sm text-neutral-500">Runway</div>
+              <div className="text-sm text-muted-foreground">Runway</div>
               <div className="text-2xl font-semibold">
                 {runways[c.nome] === null ? '&gt; 36 meses' : `${runways[c.nome]} meses`}
               </div>

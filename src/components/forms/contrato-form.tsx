@@ -178,7 +178,7 @@ export function ContratoForm({ clientes, initialData, initialClienteId, onSubmit
           {/* hidden moeda field — defaulted to BRL, not exposed in UI */}
           <input type="hidden" value={data.moeda} />
 
-          {err && <p className="text-sm text-red-600">{err}</p>}
+          {err && <p className="text-sm text-destructive">{err}</p>}
           <Button type="submit" disabled={submitting}>{submitting ? 'Salvando...' : submitLabel}</Button>
         </form>
       </CardContent>

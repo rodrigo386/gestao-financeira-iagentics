@@ -41,7 +41,7 @@ export default async function LancamentosPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold">Lançamentos</h1>
-          <p className="text-sm text-neutral-500">Últimos 30 dias ({de} → {ate})</p>
+          <p className="text-sm text-muted-foreground">Últimos 30 dias ({de} → {ate})</p>
         </div>
         <Link href="/despesas/lancamentos/novo">
           <Button>Novo lançamento</Button>
@@ -50,7 +50,7 @@ export default async function LancamentosPage() {
 
       <div className="border rounded-md">
         <table className="w-full text-sm">
-          <thead className="bg-neutral-50 dark:bg-neutral-900 text-left">
+          <thead className="bg-muted text-left">
             <tr>
               <th className="px-4 py-3">Data</th>
               <th className="px-4 py-3">Descrição</th>
@@ -63,7 +63,7 @@ export default async function LancamentosPage() {
           <tbody>
             {lancamentos.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-6 text-center text-neutral-500">
+                <td colSpan={6} className="px-4 py-6 text-center text-muted-foreground">
                   Nenhum lançamento no período.
                 </td>
               </tr>
@@ -75,14 +75,14 @@ export default async function LancamentosPage() {
                   : undefined
               return (
                 <tr key={l.id} className="border-t">
-                  <td className="px-4 py-3 text-neutral-600">{l.data}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{l.data}</td>
                   <td className="px-4 py-3 font-medium">{l.descricao}</td>
-                  <td className="px-4 py-3 text-neutral-600">{parte ?? '—'}</td>
-                  <td className="px-4 py-3 text-neutral-600">{l.categoria_id ? (categoriaMap.get(l.categoria_id) ?? '—') : '—'}</td>
-                  <td className={`px-4 py-3 text-right font-medium ${l.tipo === 'entrada' ? 'text-green-600' : 'text-red-600'}`}>
+                  <td className="px-4 py-3 text-muted-foreground">{parte ?? '—'}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{l.categoria_id ? (categoriaMap.get(l.categoria_id) ?? '—') : '—'}</td>
+                  <td className={`px-4 py-3 text-right font-medium ${l.tipo === 'entrada' ? 'text-emerald-400' : 'text-rose-400'}`}>
                     {formatMoney(l.valor, l.tipo)}
                   </td>
-                  <td className="px-4 py-3 text-neutral-600">{l.conta_id ? (contaMap.get(l.conta_id) ?? '—') : '—'}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{l.conta_id ? (contaMap.get(l.conta_id) ?? '—') : '—'}</td>
                 </tr>
               )
             })}

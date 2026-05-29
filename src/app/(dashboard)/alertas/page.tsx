@@ -38,7 +38,7 @@ export default async function AlertasPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold">Alertas</h1>
-          <p className="text-sm text-neutral-500">{naoLidos} não lido(s)</p>
+          <p className="text-sm text-muted-foreground">{naoLidos} não lido(s)</p>
         </div>
         {naoLidos > 0 && (
           <form action={marcarTodosLidos}>
@@ -48,19 +48,19 @@ export default async function AlertasPage() {
       </div>
 
       {(alertas ?? []).length === 0 ? (
-        <p className="text-neutral-500">Sem alertas.</p>
+        <p className="text-muted-foreground">Sem alertas.</p>
       ) : (
         <div className="space-y-3">
           {alertas!.map((a) => (
-            <div key={a.id} className={`border rounded-md p-4 ${a.lido ? 'bg-neutral-50' : 'bg-white border-neutral-300'}`}>
+            <div key={a.id} className={`border rounded-md p-4 ${a.lido ? 'bg-muted' : 'bg-card border-border'}`}>
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <Badge variant={SEV_VARIANT[a.severidade as string]}>{a.severidade}</Badge>
-                    <span className="text-xs text-neutral-500">{a.tipo} · {new Date(a.criado_em).toLocaleString('pt-BR')}</span>
+                    <span className="text-xs text-muted-foreground">{a.tipo} · {new Date(a.criado_em).toLocaleString('pt-BR')}</span>
                   </div>
                   <h3 className="font-medium">{a.titulo}</h3>
-                  <p className="text-sm text-neutral-600 mt-1">{a.mensagem}</p>
+                  <p className="text-sm text-muted-foreground mt-1">{a.mensagem}</p>
                 </div>
                 {!a.lido && (
                   <form action={marcarLido}>

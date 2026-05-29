@@ -29,7 +29,7 @@ export default function RootLayout({
       lang="pt-BR"
       className={`${sora.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="dark terminal-surface min-h-full flex flex-col">{children}</body>
     </html>
   );
 }

@@ -111,7 +111,7 @@ export function FornecedorForm({ initialData, onSubmit, submitLabel = 'Salvar', 
             />
             <Label htmlFor="ativo">Ativo</Label>
           </div>
-          {err && <p className="text-sm text-red-600">{err}</p>}
+          {err && <p className="text-sm text-destructive">{err}</p>}
           <Button type="submit" disabled={submitting}>{submitting ? 'Salvando...' : submitLabel}</Button>
         </form>
       </CardContent>

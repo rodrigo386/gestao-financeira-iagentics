@@ -66,7 +66,7 @@ export function LancamentoForm({ initialData, onSubmit, submitLabel = 'Salvar', 
     return (
       <Card className="max-w-2xl">
         <CardContent className="pt-6">
-          <p className="text-sm text-neutral-600">
+          <p className="text-sm text-muted-foreground">
             Adicione uma conta bancária em Configurações para começar a lançar.
           </p>
         </CardContent>
@@ -188,7 +188,7 @@ export function LancamentoForm({ initialData, onSubmit, submitLabel = 'Salvar', 
               </select>
             </div>
           </div>
-          {err && <p className="text-sm text-red-600">{err}</p>}
+          {err && <p className="text-sm text-destructive">{err}</p>}
           <Button type="submit" disabled={submitting}>{submitting ? 'Salvando...' : submitLabel}</Button>
         </form>
       </CardContent>

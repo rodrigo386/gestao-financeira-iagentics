@@ -25,7 +25,7 @@ export default async function ContratoDetailPage({ params }: { params: Promise<{
           <Badge variant={badgeVariant(contrato.status)}>{contrato.status}</Badge>
         </div>
         {cliente && (
-          <p className="mt-1 text-sm text-neutral-600">
+          <p className="mt-1 text-sm text-muted-foreground">
             Cliente:{' '}
             <Link href={`/receitas/clientes/${cliente.id}`} className="underline">
               {cliente.nome}
@@ -36,46 +36,46 @@ export default async function ContratoDetailPage({ params }: { params: Promise<{
 
       <div className="grid grid-cols-2 gap-6 max-w-2xl text-sm">
         <div>
-          <p className="text-neutral-500">Tipo</p>
+          <p className="text-muted-foreground">Tipo</p>
           <p className="font-medium capitalize">{contrato.tipo}</p>
         </div>
         <div>
-          <p className="text-neutral-500">Ticket</p>
+          <p className="text-muted-foreground">Ticket</p>
           <p className="font-medium">
             R$ {contrato.ticket.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
           </p>
         </div>
         <div>
-          <p className="text-neutral-500">Moeda</p>
+          <p className="text-muted-foreground">Moeda</p>
           <p className="font-medium">{contrato.moeda}</p>
         </div>
         <div>
-          <p className="text-neutral-500">Dia de cobrança</p>
+          <p className="text-muted-foreground">Dia de cobrança</p>
           <p className="font-medium">{contrato.dia_cobranca}</p>
         </div>
         <div>
-          <p className="text-neutral-500">Data início</p>
+          <p className="text-muted-foreground">Data início</p>
           <p className="font-medium">{contrato.data_inicio}</p>
         </div>
         <div>
-          <p className="text-neutral-500">Data fim</p>
+          <p className="text-muted-foreground">Data fim</p>
           <p className="font-medium">{contrato.data_fim ?? '—'}</p>
         </div>
         {contrato.motivo_churn && (
           <div className="col-span-2">
-            <p className="text-neutral-500">Motivo churn</p>
+            <p className="text-muted-foreground">Motivo churn</p>
             <p className="font-medium">{contrato.motivo_churn}</p>
           </div>
         )}
         {contrato.data_churn && (
           <div>
-            <p className="text-neutral-500">Data churn</p>
+            <p className="text-muted-foreground">Data churn</p>
             <p className="font-medium">{contrato.data_churn}</p>
           </div>
         )}
         {contrato.observacoes && (
           <div className="col-span-2">
-            <p className="text-neutral-500">Observações</p>
+            <p className="text-muted-foreground">Observações</p>
             <p className="font-medium">{contrato.observacoes}</p>
           </div>
         )}

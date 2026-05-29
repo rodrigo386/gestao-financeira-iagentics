@@ -11,7 +11,7 @@ export default async function RegrasCategorizacaoPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold">Regras de Categorização</h1>
-          <p className="text-sm text-neutral-500">{regras.length} regra(s) cadastrada(s)</p>
+          <p className="text-sm text-muted-foreground">{regras.length} regra(s) cadastrada(s)</p>
         </div>
         <Link href="/config/regras-categorizacao/novo">
           <Button>Nova regra</Button>
@@ -20,7 +20,7 @@ export default async function RegrasCategorizacaoPage() {
 
       <div className="border rounded-md">
         <table className="w-full text-sm">
-          <thead className="bg-neutral-50 dark:bg-neutral-900 text-left">
+          <thead className="bg-muted text-left">
             <tr>
               <th className="px-4 py-3">Prioridade</th>
               <th className="px-4 py-3">Pattern</th>
@@ -36,7 +36,7 @@ export default async function RegrasCategorizacaoPage() {
           <tbody>
             {regras.length === 0 ? (
               <tr>
-                <td colSpan={9} className="px-4 py-6 text-center text-neutral-500">
+                <td colSpan={9} className="px-4 py-6 text-center text-muted-foreground">
                   Nenhuma regra cadastrada ainda.
                 </td>
               </tr>
@@ -48,15 +48,15 @@ export default async function RegrasCategorizacaoPage() {
                   <td className="px-4 py-3">
                     <Badge variant="outline">{r.pattern_tipo}</Badge>
                   </td>
-                  <td className="px-4 py-3 text-neutral-600">{r.campo}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{r.campo}</td>
                   <td className="px-4 py-3">
                     {(r as unknown as { categoria?: { nome: string } }).categoria?.nome ?? '—'}
                   </td>
                   <td className="px-4 py-3">
                     <Badge variant={r.ativa ? 'default' : 'secondary'}>{r.ativa ? 'sim' : 'não'}</Badge>
                   </td>
-                  <td className="px-4 py-3 text-neutral-600">{r.total_aplicacoes}</td>
-                  <td className="px-4 py-3 text-neutral-600">{r.origem}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{r.total_aplicacoes}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{r.origem}</td>
                   <td className="px-4 py-3 text-right">
                     <Link href={`/config/regras-categorizacao/${r.id}`} className="text-sm underline">
                       Editar

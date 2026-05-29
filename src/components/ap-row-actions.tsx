@@ -28,14 +28,14 @@ function formatDate(iso: string) {
 export function APRowActions({ row, contas, actions }: APRowActionsProps) {
   if (row.status === 'pago') {
     return (
-      <span className="text-sm text-neutral-500">
+      <span className="text-sm text-muted-foreground">
         ✓ pago em {row.data_pagamento ? formatDate(row.data_pagamento) : '—'}
       </span>
     )
   }
 
   if (row.status === 'cancelado') {
-    return <span className="text-sm text-neutral-500">✕ cancelado</span>
+    return <span className="text-sm text-muted-foreground">✕ cancelado</span>
   }
 
   return (
@@ -52,7 +52,7 @@ export function APRowActions({ row, contas, actions }: APRowActionsProps) {
       {row.status === 'aprovado' && (
         <>
           {contas.length === 0 ? (
-            <span className="text-xs text-neutral-500">
+            <span className="text-xs text-muted-foreground">
               Cadastre uma conta bancária antes de marcar APs como pagas
             </span>
           ) : (

@@ -23,18 +23,18 @@ const STATUS_VARIANT: Record<ARRow['status'], 'default' | 'secondary' | 'destruc
 
 export function ARTable({ rows }: { rows: ARRow[] }) {
   if (rows.length === 0) {
-    return <p className="text-sm text-neutral-500">Nenhuma conta a receber.</p>
+    return <p className="text-sm text-muted-foreground">Nenhuma conta a receber.</p>
   }
   const total = rows.reduce((s, r) => s + (r.status !== 'cancelado' ? r.valor : 0), 0)
 
   return (
     <div className="space-y-3">
-      <div className="text-sm text-neutral-500">
+      <div className="text-sm text-muted-foreground">
         {rows.length} conta(s) · Total previsto: <strong>R$ {total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong>
       </div>
       <div className="border rounded-md overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-neutral-50 dark:bg-neutral-900 text-left">
+          <thead className="bg-muted text-left">
             <tr>
               <th className="px-4 py-3">Cliente</th>
               <th className="px-4 py-3">Origem</th>
@@ -52,7 +52,7 @@ export function ARTable({ rows }: { rows: ARRow[] }) {
                     {r.cliente?.nome ?? '—'}
                   </Link>
                 </td>
-                <td className="px-4 py-3 text-neutral-600">{r.origem}</td>
+                <td className="px-4 py-3 text-muted-foreground">{r.origem}</td>
                 <td className="px-4 py-3">{r.data_emissao}</td>
                 <td className="px-4 py-3">{r.data_vencimento}</td>
                 <td className="px-4 py-3 text-right">R$ {r.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>

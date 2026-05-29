@@ -78,11 +78,11 @@ export default async function ContasPagarPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold">Contas a Pagar</h1>
-        <p className="text-sm text-neutral-500">Últimos 30 dias + próximos 60 dias</p>
+        <p className="text-sm text-muted-foreground">Últimos 30 dias + próximos 60 dias</p>
       </div>
 
       {contas.length === 0 && (
-        <div className="rounded-md border border-yellow-200 bg-yellow-50 px-4 py-3 text-sm text-yellow-800 dark:border-yellow-800 dark:bg-yellow-950 dark:text-yellow-200">
+        <div className="rounded-md border border-amber-400/40 bg-amber-400/10 px-4 py-3 text-sm text-amber-300">
           Nenhuma conta bancária ativa cadastrada.{' '}
           <Link href="/config/contas-bancarias" className="underline">
             Cadastrar conta bancária
@@ -92,10 +92,10 @@ export default async function ContasPagarPage() {
       )}
 
       {rows.length === 0 ? (
-        <p className="text-sm text-neutral-500">Nenhuma conta a pagar no período.</p>
+        <p className="text-sm text-muted-foreground">Nenhuma conta a pagar no período.</p>
       ) : (
         <div className="space-y-3">
-          <div className="text-sm text-neutral-500">
+          <div className="text-sm text-muted-foreground">
             {rows.length} conta(s) · Total pendente:{' '}
             <strong>
               R$ {total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
@@ -103,7 +103,7 @@ export default async function ContasPagarPage() {
           </div>
           <div className="border rounded-md overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-neutral-50 dark:bg-neutral-900 text-left">
+              <thead className="bg-muted text-left">
                 <tr>
                   <th className="px-4 py-3">Descrição</th>
                   <th className="px-4 py-3">Vencimento</th>
@@ -118,7 +118,7 @@ export default async function ContasPagarPage() {
                     <td className="px-4 py-3">
                       <div className="font-medium">{r.descricao}</div>
                       {r.fornecedor && (
-                        <div className="text-xs text-neutral-500">
+                        <div className="text-xs text-muted-foreground">
                           {(r.fornecedor as { nome: string }).nome}
                         </div>
                       )}

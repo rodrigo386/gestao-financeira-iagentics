@@ -72,19 +72,19 @@ export function PendenciaRow({ lancamento: l, categorias, atualizarCategoria, cr
     <div className="px-4 py-4 space-y-3">
       {/* Main row */}
       <div className="flex flex-wrap items-center gap-4">
-        <span className="text-sm text-neutral-500 w-24 shrink-0">{l.data}</span>
+        <span className="text-sm text-muted-foreground w-24 shrink-0">{l.data}</span>
         <span className="text-sm font-medium flex-1 min-w-0 truncate">{l.descricao}</span>
-        <span className={`text-sm font-semibold w-28 text-right shrink-0 ${isEntrada ? 'text-green-600' : 'text-red-600'}`}>
+        <span className={`text-sm font-semibold w-28 text-right shrink-0 ${isEntrada ? 'text-emerald-400' : 'text-rose-400'}`}>
           {isEntrada ? '+' : '-'} R$ {Number(l.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
         </span>
-        <span className="text-sm text-neutral-500 w-24 shrink-0">
+        <span className="text-sm text-muted-foreground w-24 shrink-0">
           {l.conta?.nome ?? '—'}
         </span>
         <Badge variant={metodoVariant(l.categorizacao_metodo ?? null)} className="shrink-0">
           {metodoLabel}
         </Badge>
         {l.categorizacao_confianca != null && (
-          <span className="text-xs text-neutral-500 shrink-0">
+          <span className="text-xs text-muted-foreground shrink-0">
             {Math.round(l.categorizacao_confianca * 100)}%
           </span>
         )}
@@ -123,9 +123,9 @@ export function PendenciaRow({ lancamento: l, categorias, atualizarCategoria, cr
 
       {/* Regra inline form */}
       {showRegraForm && (
-        <form onSubmit={handleCriarRegra} className="pl-28 flex flex-wrap items-end gap-3 bg-neutral-50 dark:bg-neutral-900 rounded-md p-3">
+        <form onSubmit={handleCriarRegra} className="pl-28 flex flex-wrap items-end gap-3 bg-muted rounded-md p-3">
           <div className="space-y-1">
-            <label className="text-xs text-neutral-500">Pattern</label>
+            <label className="text-xs text-muted-foreground">Pattern</label>
             <input
               className="border rounded-md px-2 py-1.5 text-sm w-40"
               value={regraPattern}
@@ -134,7 +134,7 @@ export function PendenciaRow({ lancamento: l, categorias, atualizarCategoria, cr
             />
           </div>
           <div className="space-y-1">
-            <label className="text-xs text-neutral-500">Categoria</label>
+            <label className="text-xs text-muted-foreground">Categoria</label>
             <select
               className="border rounded-md px-2 py-1.5 text-sm"
               value={regraCategoria}
