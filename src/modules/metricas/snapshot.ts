@@ -1,6 +1,7 @@
 import 'server-only'
 import type { Contrato } from '@/lib/schemas/contrato'
 import { calcularMRR, calcularARR, calcularChurnRate } from '@/modules/receitas/metricas'
+import { createServiceClient } from '@/lib/supabase/service'
 
 export type MetricasMes = {
   mes_ref: string
@@ -73,4 +74,34 @@ function round2(n: number): number {
 
 function round4(n: number): number {
   return Math.round(n * 10000) / 10000
+}
+
+/** Carrega dados reais do mês e monta as métricas realizadas. */
+export async function computeMetricasMes(mesRef: string): Promise<MetricasMes> {
+  const admin = createServiceClient()
+  const fimMes = addMonthsFirstDay(mesRef, 1)
+
+  const { data: contratosRows } = await admin.from('contratos').select('*')
+  const contratos = (contratosRows ?? []) as Contrato[]
+
+  const { data: lancs } = await admin
+    .from('lancamentos').select('tipo, valor')
+    .gte('data', mesRef).lt('data', fimMes)
+  const lancamentos = ((lancs ?? []) as { tipo: 'entrada' | 'saida'; valor: number | string }[])
+    .map((l) => ({ tipo: l.tipo, valor: Number(l.valor) }))
+
+  const { data: contas } = await admin
+    .from('contas_bancarias').select('saldo_atual').eq('ativa', true)
+  const caixaFim = (contas ?? []).reduce((s, c) => s + Number(c.saldo_atual), 0)
+
+  return montarMetricas({ mesRef, contratos, lancamentos, caixaFim })
+}
+
+/** Primeiro dia do mês deslocado por `months` (positivo ou negativo). */
+export function addMonthsFirstDay(mesRef: string, months: number): string {
+  const [y, m] = mesRef.split('-').map(Number)
+  const total = y! * 12 + (m! - 1) + months
+  const yy = Math.floor(total / 12)
+  const mm = (total % 12) + 1
+  return `${yy}-${String(mm).padStart(2, '0')}-01`
 }
