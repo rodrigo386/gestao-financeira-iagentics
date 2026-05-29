@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>IAgentics — Relatório Financeiro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --paper:#f6f3ec; --paper-2:#fffdf8; --ink:#1b1a16; --soft:#6b665b; --hair:#d8d2c5;
+    --ox:#8a2018; --teal:#16544c; --gold:#9a7b2e;
+    --serif:'Fraunces',Georgia,serif; --sans:'Hanken Grotesk',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--paper);color:var(--ink);font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;line-height:1.5;
+    background-image:radial-gradient(1200px 500px at 100% -5%, rgba(22,84,76,.05), transparent 60%);}
+  /* subtle paper grain */
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.4;z-index:0;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.025'/%3E%3C/svg%3E");}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 38px;position:relative;z-index:1}
+
+  /* masthead */
+  header{padding:46px 0 22px;border-bottom:2px solid var(--ink)}
+  .kicker{font-size:12px;letter-spacing:.42em;text-transform:uppercase;color:var(--ox);font-weight:600}
+  .masthead{display:flex;align-items:flex-end;justify-content:space-between;margin-top:12px;gap:20px;flex-wrap:wrap}
+  h1.title{font-family:var(--serif);font-weight:500;font-size:clamp(34px,5vw,58px);letter-spacing:-.02em;line-height:.95;font-optical-sizing:auto}
+  h1.title em{font-style:italic;color:var(--teal)}
+  .issue{text-align:right;font-size:12.5px;color:var(--soft);line-height:1.7}
+  .issue b{color:var(--ink);font-weight:600}
+
+  .lede{font-family:var(--serif);font-size:19px;line-height:1.55;color:#322f28;max-width:62ch;margin:22px 0 0;font-weight:400}
+  .lede::first-letter{font-size:58px;float:left;line-height:.8;padding:6px 10px 0 0;color:var(--ox);font-weight:600}
+
+  /* hero numbers */
+  .hero{display:grid;grid-template-columns:1.2fr .9fr .9fr;gap:0;margin-top:38px;border-top:1px solid var(--hair);border-bottom:1px solid var(--hair)}
+  .figure{padding:24px 26px 26px;border-right:1px solid var(--hair);opacity:0;animation:fade .8s ease forwards}
+  .figure:last-child{border-right:none}
+  .figure:nth-child(1){animation-delay:.05s}.figure:nth-child(2){animation-delay:.12s}.figure:nth-child(3){animation-delay:.19s}
+  .figure .cap{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--soft)}
+  .figure .n{font-family:var(--serif);font-weight:500;font-size:clamp(40px,6vw,68px);letter-spacing:-.03em;line-height:1;margin-top:14px;font-variant-numeric:tabular-nums}
+  .figure .n small{font-size:24px;color:var(--soft)}
+  .figure .delta{margin-top:12px;font-size:13px;font-weight:600}
+  .delta.up{color:var(--teal)} .delta.dn{color:var(--ox)}
+  @media(max-width:820px){.hero{grid-template-columns:1fr 1fr}.figure:nth-child(1){grid-column:1/-1;border-right:none;border-bottom:1px solid var(--hair)}}
+
+  /* secondary metric strip */
+  .strip{display:flex;flex-wrap:wrap;gap:34px;margin-top:22px;padding-bottom:6px}
+  .mini .k{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--soft)}
+  .mini .v{font-family:var(--serif);font-size:24px;font-weight:500;margin-top:4px;font-variant-numeric:tabular-nums}
+  .mini.alert .v{color:var(--ox)}
+
+  /* body grid */
+  .cols{display:grid;grid-template-columns:1.55fr 1fr;gap:46px;margin-top:42px}
+  @media(max-width:820px){.cols{grid-template-columns:1fr;gap:34px}}
+  .sechead{font-family:var(--serif);font-style:italic;font-size:22px;font-weight:500;margin-bottom:4px}
+  .sechead + .meta{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--soft);padding-bottom:14px;border-bottom:1px solid var(--hair)}
+
+  .chartcard{margin-top:18px}
+  .legend{display:flex;gap:24px;font-size:12.5px;color:var(--soft);margin-top:12px}
+  .legend i{display:inline-block;width:22px;height:0;border-top:2px solid;vertical-align:middle;margin-right:7px}
+
+  .commentary{font-family:var(--serif);font-size:17px;line-height:1.62;color:#2a2820;margin-top:16px}
+  .commentary b{font-weight:600;color:var(--ink);background:linear-gradient(transparent 62%, rgba(154,123,46,.28) 0)}
+  .pull{margin:20px 0;padding-left:18px;border-left:3px solid var(--ox);font-family:var(--serif);font-style:italic;font-size:18px;color:var(--ox)}
+
+  .ledger{margin-top:10px}
+  .ledger .li{display:flex;align-items:baseline;gap:14px;padding:13px 0;border-bottom:1px solid var(--hair)}
+  .ledger .li .tag{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);min-width:78px}
+  .ledger .li .desc{font-size:14px}
+  .ledger .li .amt{margin-left:auto;font-family:var(--serif);font-size:18px;font-weight:500;font-variant-numeric:tabular-nums}
+  .amt.pos{color:var(--teal)} .amt.neg{color:var(--ox)}
+  .ledger .li .sev{font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border:1px solid var(--hair);border-radius:999px;color:var(--soft)}
+  .sev.w{color:var(--ox);border-color:rgba(138,32,24,.35)}
+
+  footer{margin-top:54px;padding:22px 0 60px;border-top:2px solid var(--ink);
+    display:flex;justify-content:space-between;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--soft);flex-wrap:wrap;gap:10px}
+  @keyframes fade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  @keyframes draw{to{stroke-dashoffset:0}}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="kicker">IAgentics · Relatório Financeiro Interno</div>
+      <div class="masthead">
+        <h1 class="title">O <em>Boletim</em> do Caixa</h1>
+        <div class="issue"><b>Edição Maio · 2026</b><br/>Vol. 1 — Nº 06<br/>Confidencial</div>
+      </div>
+      <p class="lede">Crescimento de receita firme e queima sob vigília: a IAgentics fechou maio com MRR em alta de dois dígitos, porém com o caixa cedendo pelo sexto mês — um equilíbrio que define a janela de manobra à frente.</p>
+    </header>
+
+    <section class="hero">
+      <div class="figure">
+        <div class="cap">Receita Recorrente Mensal</div>
+        <div class="n">R$ 28,4<small>k</small></div>
+        <div class="delta up">↑ R$ 3.100 — +12,5% no mês</div>
+      </div>
+      <div class="figure">
+        <div class="cap">Caixa em conta</div>
+        <div class="n">R$ 248<small>k</small></div>
+        <div class="delta dn">↓ R$ 8.100 no mês</div>
+      </div>
+      <div class="figure">
+        <div class="cap">Runway</div>
+        <div class="n">14<small> meses</small></div>
+        <div class="delta dn">cenário base · −1,1m</div>
+      </div>
+    </section>
+
+    <div class="strip">
+      <div class="mini"><div class="k">ARR projetado</div><div class="v">R$ 340,8k</div></div>
+      <div class="mini alert"><div class="k">Burn líquido / mês</div><div class="v">R$ 38,2k</div></div>
+      <div class="mini"><div class="k">Contratos ativos</div><div class="v">2 <span style="font-size:13px;color:var(--soft)">/ meta 10</span></div></div>
+      <div class="mini"><div class="k">A receber (30d)</div><div class="v">R$ 31,0k</div></div>
+    </div>
+
+    <div class="cols">
+      <section>
+        <div class="sechead">A travessia do caixa</div>
+        <div class="meta">Seis meses · MRR vs. saldo em conta</div>
+        <div class="chartcard">
+          <svg viewBox="0 0 640 250" width="100%" height="250">
+            <g stroke="#d8d2c5" stroke-width="1">
+              <line x1="0" y1="50" x2="640" y2="50"/><line x1="0" y1="110" x2="640" y2="110"/>
+              <line x1="0" y1="170" x2="640" y2="170"/><line x1="0" y1="225" x2="640" y2="225"/>
+            </g>
+            <path d="M0,60 L128,78 L256,98 L384,112 L512,126 L640,140" fill="none" stroke="#8a2018" stroke-width="2.5"
+              stroke-dasharray="1100" stroke-dashoffset="1100" style="animation:draw 1.5s ease .4s forwards"/>
+            <path d="M0,196 L128,188 L256,166 L384,146 L512,138 L640,112" fill="none" stroke="#16544c" stroke-width="2.5"
+              stroke-dasharray="1100" stroke-dashoffset="1100" style="animation:draw 1.5s ease .2s forwards"/>
+            <circle cx="640" cy="112" r="4" fill="#16544c"/><circle cx="640" cy="140" r="4" fill="#8a2018"/>
+            <g fill="#6b665b" font-family="Hanken Grotesk" font-size="12">
+              <text x="0" y="244">dez</text><text x="124" y="244">jan</text><text x="252" y="244">fev</text>
+              <text x="380" y="244">mar</text><text x="508" y="244">abr</text><text x="612" y="244">mai</text>
+            </g>
+          </svg>
+          <div class="legend"><span><i style="color:#16544c"></i>MRR (18,0 → 28,4k)</span><span><i style="color:#8a2018"></i>Caixa (298 → 248k)</span></div>
+        </div>
+
+        <div class="sechead" style="margin-top:40px">Leitura do mês</div>
+        <div class="meta">Comentário gerado por IA · variação mês a mês</div>
+        <p class="commentary">O MRR avançou <b>R$ 3.100 (+12,5%)</b>, puxado pelo novo contrato recorrente da Acme — a maior adição da curta história da casa. Em sentido oposto, o burn líquido subiu a <b>R$ 38,2k</b>, tendo o 13º proporcional na folha de maio como principal ofensor.</p>
+        <p class="pull">“No ritmo atual, restam cerca de 14 meses de pista. A pergunta é se a despesa de maio é recorrente.”</p>
+        <p class="commentary">O caixa recuou R$ 8,1k, sexto mês consecutivo de queda. Antes de revisar o forecast, convém isolar o que é pontual do que veio para ficar.</p>
+      </section>
+
+      <aside>
+        <div class="sechead" style="font-style:normal">Destaques &amp; alertas</div>
+        <div class="meta">Movimentos materiais e avisos</div>
+        <div class="ledger">
+          <div class="li"><span class="tag">Receita</span><span class="desc">Novo contrato — Acme</span><span class="amt pos">+R$ 3,1k</span></div>
+          <div class="li"><span class="tag">Despesa</span><span class="desc">13º proporcional (folha)</span><span class="amt neg">+R$ 6,2k</span></div>
+          <div class="li"><span class="sev w">aviso</span><span class="desc">Runway &lt; 12m no cenário Worst</span></div>
+          <div class="li"><span class="sev w">aviso</span><span class="desc">AWS R$ 4,8k — 2,1× a média de 90d</span></div>
+          <div class="li"><span class="sev">info</span><span class="desc">Beta Corp vence em 38 dias</span></div>
+        </div>
+      </aside>
+    </div>
+
+    <footer>
+      <span>IAgentics — gestão financeira interna</span>
+      <span>Dados mock · 29 mai 2026</span>
+    </footer>
+  </div>
+</body>
+</html>
