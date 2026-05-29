@@ -67,4 +67,4 @@ npm run test:e2e           # playwright (precisa supabase start)
 | 3 ✅ | Folha de Pagamento (CLT + PJ Spot) |
 | 4 ✅ | Bancos (Pluggy) + Categorização |
 | 5 ✅ | Forecast + Alertas |
-| 6 | Dashboard Executivo |
+| 6 ✅ | Dashboard Executivo (KPIs, tendência, commentary IA, fechamento mensal) |
