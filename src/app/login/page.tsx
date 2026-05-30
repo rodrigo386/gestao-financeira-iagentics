@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/browser'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -8,25 +9,26 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function LoginPage() {
+  const router = useRouter()
   const [email, setEmail] = useState('')
-  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+  const [senha, setSenha] = useState('')
+  const [submitting, setSubmitting] = useState(false)
   const [errMsg, setErrMsg] = useState<string | null>(null)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setStatus('sending')
+    setSubmitting(true)
     setErrMsg(null)
     const supabase = createClient()
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
-    })
+    const { error } = await supabase.auth.signInWithPassword({ email, password: senha })
     if (error) {
-      setStatus('error')
-      setErrMsg(error.message)
+      setSubmitting(false)
+      setErrMsg('E-mail ou senha inválidos.')
       return
     }
-    setStatus('sent')
+    const next = new URLSearchParams(window.location.search).get('next') || '/'
+    router.push(next)
+    router.refresh()
   }
 
   return (
@@ -36,27 +38,36 @@ export default function LoginPage() {
           <CardTitle>Entrar — IAgentics Finanças</CardTitle>
         </CardHeader>
         <CardContent>
-          {status === 'sent' ? (
-            <p className="text-sm">Link de acesso enviado para <strong>{email}</strong>. Verifique seu e-mail.</p>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">E-mail</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="voce@iagentics.com"
-                />
-              </div>
-              <Button type="submit" className="w-full" disabled={status === 'sending'}>
-                {status === 'sending' ? 'Enviando...' : 'Enviar link de acesso'}
-              </Button>
-              {errMsg && <p className="text-sm text-destructive">{errMsg}</p>}
-            </form>
-          )}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">E-mail</Label>
+              <Input
+                id="email"
+                type="email"
+                required
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="voce@iagentics.com"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="senha">Senha</Label>
+              <Input
+                id="senha"
+                type="password"
+                required
+                autoComplete="current-password"
+                value={senha}
+                onChange={(e) => setSenha(e.target.value)}
+                placeholder="••••••••"
+              />
+            </div>
+            <Button type="submit" className="w-full" disabled={submitting}>
+              {submitting ? 'Entrando...' : 'Entrar'}
+            </Button>
+            {errMsg && <p className="text-sm text-destructive">{errMsg}</p>}
+          </form>
         </CardContent>
       </Card>
     </div>
