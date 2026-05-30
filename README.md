@@ -27,9 +27,28 @@ supabase db reset
 npm run dev
 ```
 
-App em http://localhost:3000. Mailbox local em http://127.0.0.1:54324 (Mailpit — captura magic links).
+App em http://localhost:3000.
 
-**Primeiro login:** o primeiro usuário criado vira `admin` automaticamente; subsequentes nascem `leitura` (admin promove via tabela `usuarios`).
+## Autenticação
+
+Login por **e-mail + senha** (`signInWithPassword`). Não há auto-cadastro:
+contas são criadas por um admin em **/config/usuarios**.
+
+### Primeiro admin (bootstrap)
+
+Com o Supabase configurado, defina no ambiente e rode uma vez:
+
+```bash
+export NEXT_PUBLIC_SUPABASE_URL=...        # ou http://127.0.0.1:54321 local
+export SUPABASE_SERVICE_ROLE_KEY=...
+export BOOTSTRAP_ADMIN_EMAIL=voce@iagentics.com
+export BOOTSTRAP_ADMIN_PASSWORD='uma-senha-forte'
+export BOOTSTRAP_ADMIN_NOME='Seu Nome'
+npm run bootstrap:admin
+```
+
+O script é idempotente: re-rodar atualiza a senha do admin e mantém um único admin.
+No Supabase Cloud, desabilite "Allow new users to sign up" em Authentication → Sign In / Providers.
 
 ## Testes
 
@@ -43,7 +62,7 @@ npm run test:e2e           # playwright (precisa supabase start)
 
 - `src/app/` — rotas Next.js (App Router)
   - `(dashboard)/` — área autenticada com sidebar
-  - `login/`, `auth/callback/` — fluxo de magic link
+  - `login/`, `auth/callback/` — fluxo de autenticação por senha
 - `src/lib/supabase/` — clients (server, browser, middleware, service-role)
 - `src/lib/schemas/` — Zod schemas compartilhados
 - `src/lib/audit.ts` — wrapper `withAudit()` para mutações sensíveis
