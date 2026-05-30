@@ -12,11 +12,16 @@ export type ListAPParams = {
   tipo_credor?: 'fornecedor' | 'funcionario' | 'pj_spot' | 'orgao_publico'
 }
 
+// PostgREST projection for AP rows. contas_a_pagar.categoria_id has a real FK to
+// categorias, so that embed is valid. The creditor is polymorphic (tipo_credor +
+// credor_id, with NO foreign key), so fornecedores CANNOT be embedded here.
+export const AP_SELECT = '*, categoria:categorias(nome)'
+
 export async function listarAP(p: ListAPParams = {}) {
   const supabase = await createClient()
   let q = supabase
     .from('contas_a_pagar')
-    .select('*, fornecedor:fornecedores(nome), categoria:categorias(nome)')
+    .select(AP_SELECT)
     .order('data_vencimento', { ascending: true })
   if (p.status) q = q.eq('status', p.status)
   if (p.vencimento_de) q = q.gte('data_vencimento', p.vencimento_de)

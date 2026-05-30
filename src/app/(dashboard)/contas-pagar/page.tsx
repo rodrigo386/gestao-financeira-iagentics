@@ -84,7 +84,7 @@ export default async function ContasPagarPage() {
       {contas.length === 0 && (
         <div className="rounded-md border border-amber-400/40 bg-amber-400/10 px-4 py-3 text-sm text-amber-300">
           Nenhuma conta bancária ativa cadastrada.{' '}
-          <Link href="/config/contas-bancarias" className="underline">
+          <Link href="/config/contas-bancarias" className="text-primary underline">
             Cadastrar conta bancária
           </Link>{' '}
           para poder marcar APs como pagas.
@@ -117,11 +117,6 @@ export default async function ContasPagarPage() {
                   <tr key={r.id} className="border-t">
                     <td className="px-4 py-3">
                       <div className="font-medium">{r.descricao}</div>
-                      {r.fornecedor && (
-                        <div className="text-xs text-muted-foreground">
-                          {(r.fornecedor as { nome: string }).nome}
-                        </div>
-                      )}
                     </td>
                     <td className="px-4 py-3">{formatDate(r.data_vencimento)}</td>
                     <td className="px-4 py-3 text-right">
