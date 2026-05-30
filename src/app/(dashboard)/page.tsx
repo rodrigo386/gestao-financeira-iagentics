@@ -183,7 +183,7 @@ export default async function HomePage() {
                     </div>
                   )
                 })}
-                <a href="/alertas" className="inline-block text-sm text-[var(--brand-blue)] hover:underline">Ver todos →</a>
+                <a href="/alertas" className="inline-block text-sm text-primary underline">Ver todos →</a>
               </div>
             )}
         </Panel>

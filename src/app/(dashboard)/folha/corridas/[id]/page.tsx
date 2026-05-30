@@ -149,7 +149,7 @@ export default async function CorridaDetailPage({
           )}
         </div>
         <div className="pt-1">
-          <Link href="/folha/corridas" className="text-sm underline text-muted-foreground">
+          <Link href="/folha/corridas" className="text-sm text-primary underline">
             ← Voltar para corridas
           </Link>
         </div>
@@ -203,7 +203,7 @@ export default async function CorridaDetailPage({
                         href={`/api/holerite/${item.id}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm underline"
+                        className="text-sm text-primary underline"
                       >
                         PDF
                       </a>

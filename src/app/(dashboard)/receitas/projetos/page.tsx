@@ -63,7 +63,7 @@ export default async function ProjetosPage() {
                   <Badge variant={badgeVariant(p.status)}>{p.status}</Badge>
                 </td>
                 <td className="px-4 py-3 text-right">
-                  <Link href={`/receitas/projetos/${p.id}`} className="text-sm underline">Ver</Link>
+                  <Link href={`/receitas/projetos/${p.id}`} className="text-sm text-primary underline">Ver</Link>
                 </td>
               </tr>
             ))}

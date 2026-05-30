@@ -45,7 +45,7 @@ export default async function ClientesPage() {
                   <Badge variant={c.status === 'ativo' ? 'default' : 'secondary'}>{c.status}</Badge>
                 </td>
                 <td className="px-4 py-3 text-right">
-                  <Link href={`/receitas/clientes/${c.id}`} className="text-sm underline">Ver</Link>
+                  <Link href={`/receitas/clientes/${c.id}`} className="text-sm text-primary underline">Ver</Link>
                 </td>
               </tr>
             ))}

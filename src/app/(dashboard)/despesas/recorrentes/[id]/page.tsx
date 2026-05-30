@@ -53,7 +53,7 @@ export default async function RecorrenteDetailPage({ params }: { params: Promise
         {recorrente.fornecedor_id && (
           <div className="grid grid-cols-2 gap-2">
             <span className="text-muted-foreground">Fornecedor</span>
-            <Link href={`/despesas/fornecedores/${recorrente.fornecedor_id}`} className="underline">
+            <Link href={`/despesas/fornecedores/${recorrente.fornecedor_id}`} className="text-primary underline">
               Ver fornecedor
             </Link>
           </div>

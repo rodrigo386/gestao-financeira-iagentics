@@ -138,7 +138,7 @@ export default async function ConciliacaoPage() {
                       {s.candidato_id ? (
                         <a
                           href={`${apArPath}/${s.candidato_id}`}
-                          className="text-sm underline text-primary hover:underline"
+                          className="text-sm text-primary underline"
                         >
                           {s.candidato_tipo?.toUpperCase()} {s.candidato_id.slice(0, 8)}…
                         </a>

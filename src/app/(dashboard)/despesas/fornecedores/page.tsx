@@ -54,7 +54,7 @@ export default async function FornecedoresPage() {
                   <Badge variant={f.ativo ? 'default' : 'secondary'}>{f.ativo ? 'ativo' : 'inativo'}</Badge>
                 </td>
                 <td className="px-4 py-3 text-right">
-                  <Link href={`/despesas/fornecedores/${f.id}`} className="text-sm underline">Ver</Link>
+                  <Link href={`/despesas/fornecedores/${f.id}`} className="text-sm text-primary underline">Ver</Link>
                 </td>
               </tr>
             ))}

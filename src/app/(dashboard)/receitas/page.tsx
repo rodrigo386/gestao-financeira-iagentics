@@ -51,10 +51,10 @@ export default async function ReceitasPage() {
       <Card>
         <CardHeader><CardTitle>Próximos passos</CardTitle></CardHeader>
         <CardContent className="text-sm text-muted-foreground space-y-1">
-          <p>· <Link href="/receitas/clientes" className="underline">Cadastre clientes</Link></p>
-          <p>· <Link href="/receitas/contratos" className="underline">Adicione contratos AaaS</Link> para começar a ter MRR</p>
-          <p>· <Link href="/receitas/projetos" className="underline">Crie projetos</Link> com milestones para faturamento por etapa</p>
-          <p>· <Link href="/contas-receber" className="underline">Veja AR previstas</Link> (gera automaticamente todo dia 1º do mês)</p>
+          <p>· <Link href="/receitas/clientes" className="text-primary underline">Cadastre clientes</Link></p>
+          <p>· <Link href="/receitas/contratos" className="text-primary underline">Adicione contratos AaaS</Link> para começar a ter MRR</p>
+          <p>· <Link href="/receitas/projetos" className="text-primary underline">Crie projetos</Link> com milestones para faturamento por etapa</p>
+          <p>· <Link href="/contas-receber" className="text-primary underline">Veja AR previstas</Link> (gera automaticamente todo dia 1º do mês)</p>
         </CardContent>
       </Card>
     </div>

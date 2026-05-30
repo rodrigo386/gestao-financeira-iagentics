@@ -51,7 +51,7 @@ export default async function RecorrentesPage() {
                     <Badge variant={r.ativa ? 'default' : 'secondary'}>{r.ativa ? 'ativa' : 'inativa'}</Badge>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <Link href={`/despesas/recorrentes/${r.id}`} className="text-sm underline">Ver</Link>
+                    <Link href={`/despesas/recorrentes/${r.id}`} className="text-sm text-primary underline">Ver</Link>
                   </td>
                 </tr>
               )

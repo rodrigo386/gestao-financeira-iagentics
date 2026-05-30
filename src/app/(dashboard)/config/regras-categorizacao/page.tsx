@@ -58,7 +58,7 @@ export default async function RegrasCategorizacaoPage() {
                   <td className="px-4 py-3 text-muted-foreground">{r.total_aplicacoes}</td>
                   <td className="px-4 py-3 text-muted-foreground">{r.origem}</td>
                   <td className="px-4 py-3 text-right">
-                    <Link href={`/config/regras-categorizacao/${r.id}`} className="text-sm underline">
+                    <Link href={`/config/regras-categorizacao/${r.id}`} className="text-sm text-primary underline">
                       Editar
                     </Link>
                   </td>

@@ -141,7 +141,7 @@ export default async function PJSpotDetailPage({ params }: Props) {
                         }}>
                           <button
                             type="submit"
-                            className="text-xs underline text-primary hover:underline"
+                            className="text-xs text-primary underline"
                           >
                             Faturar (gerar AP)
                           </button>

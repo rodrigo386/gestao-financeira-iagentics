@@ -50,7 +50,7 @@ export default async function ProjetoDetailPage({ params }: { params: Promise<{ 
         {cliente && (
           <p className="mt-1 text-sm text-muted-foreground">
             Cliente:{' '}
-            <Link href={`/receitas/clientes/${cliente.id}`} className="underline">
+            <Link href={`/receitas/clientes/${cliente.id}`} className="text-primary underline">
               {cliente.nome}
             </Link>
           </p>

@@ -48,7 +48,7 @@ export function ARTable({ rows }: { rows: ARRow[] }) {
             {rows.map((r) => (
               <tr key={r.id} className="border-t">
                 <td className="px-4 py-3">
-                  <Link href={`/receitas/clientes/${r.cliente_id}`} className="underline">
+                  <Link href={`/receitas/clientes/${r.cliente_id}`} className="text-primary underline">
                     {r.cliente?.nome ?? '—'}
                   </Link>
                 </td>

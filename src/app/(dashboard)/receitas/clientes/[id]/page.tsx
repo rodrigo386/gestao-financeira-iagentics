@@ -29,7 +29,7 @@ export default async function ClienteDetailPage({ params }: { params: Promise<{ 
       <section>
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-lg font-medium">Contratos ({contratos.length})</h2>
-          <Link href={`/receitas/contratos/novo?cliente=${id}`} className="text-sm underline">+ Novo contrato</Link>
+          <Link href={`/receitas/contratos/novo?cliente=${id}`} className="text-sm text-primary underline">+ Novo contrato</Link>
         </div>
         {contratos.length === 0 ? (
           <p className="text-sm text-muted-foreground">Sem contratos.</p>
@@ -39,7 +39,7 @@ export default async function ClienteDetailPage({ params }: { params: Promise<{ 
               <li key={c.id} className="border rounded-md p-3">
                 <div className="flex justify-between">
                   <div>
-                    <Link href={`/receitas/contratos/${c.id}`} className="font-medium underline">{c.nome}</Link>
+                    <Link href={`/receitas/contratos/${c.id}`} className="font-medium text-primary underline">{c.nome}</Link>
                     <div className="text-xs text-muted-foreground">{c.tipo} · R$ {c.ticket} · desde {c.data_inicio}</div>
                   </div>
                   <Badge variant={c.status === 'ativo' ? 'default' : 'secondary'}>{c.status}</Badge>
@@ -53,7 +53,7 @@ export default async function ClienteDetailPage({ params }: { params: Promise<{ 
       <section>
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-lg font-medium">Projetos ({projetos.length})</h2>
-          <Link href={`/receitas/projetos/novo?cliente=${id}`} className="text-sm underline">+ Novo projeto</Link>
+          <Link href={`/receitas/projetos/novo?cliente=${id}`} className="text-sm text-primary underline">+ Novo projeto</Link>
         </div>
         {projetos.length === 0 ? (
           <p className="text-sm text-muted-foreground">Sem projetos.</p>
@@ -63,7 +63,7 @@ export default async function ClienteDetailPage({ params }: { params: Promise<{ 
               <li key={p.id} className="border rounded-md p-3">
                 <div className="flex justify-between">
                   <div>
-                    <Link href={`/receitas/projetos/${p.id}`} className="font-medium underline">{p.nome}</Link>
+                    <Link href={`/receitas/projetos/${p.id}`} className="font-medium text-primary underline">{p.nome}</Link>
                     <div className="text-xs text-muted-foreground">R$ {p.valor_total} · {p.data_inicio} → {p.data_prevista_fim}</div>
                   </div>
                   <Badge variant={p.status === 'ativo' ? 'default' : 'secondary'}>{p.status}</Badge>

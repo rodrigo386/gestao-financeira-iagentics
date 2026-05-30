@@ -181,7 +181,7 @@ export default async function FuncionarioDetailPage({ params }: { params: Promis
                     <td className="px-4 py-3 font-medium">{formatBRL(item.liquido_pagar)}</td>
                     <td className="px-4 py-3">
                       {item.holerite ? (
-                        <Link href={`/api/holerite/${item.id}`} className="text-sm underline" target="_blank">
+                        <Link href={`/api/holerite/${item.id}`} className="text-sm text-primary underline" target="_blank">
                           Baixar PDF
                         </Link>
                       ) : (

@@ -71,7 +71,7 @@ export default async function BancosPage() {
             href="https://my.pluggy.ai"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm underline text-primary hover:underline"
+            className="text-sm text-primary underline"
           >
             Conectar novo banco (Pluggy)
           </a>

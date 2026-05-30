@@ -87,7 +87,7 @@ export default async function FolhaPage() {
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold">{numFuncionarios}</p>
-            <Link href="/folha/funcionarios" className="text-xs text-muted-foreground underline mt-1 block">
+            <Link href="/folha/funcionarios" className="text-xs text-primary underline mt-1 block">
               Ver lista
             </Link>
           </CardContent>
@@ -99,7 +99,7 @@ export default async function FolhaPage() {
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold">{numPJSpot}</p>
-            <Link href="/folha/pj-spot" className="text-xs text-muted-foreground underline mt-1 block">
+            <Link href="/folha/pj-spot" className="text-xs text-primary underline mt-1 block">
               Ver lista
             </Link>
           </CardContent>
@@ -131,13 +131,13 @@ export default async function FolhaPage() {
         <CardContent className="space-y-2 text-sm">
           <div className="flex items-center gap-2">
             <span className="text-muted-foreground">1.</span>
-            <Link href="/folha/funcionarios" className="underline text-foreground">
+            <Link href="/folha/funcionarios" className="text-primary underline">
               Cadastrar funcionários CLT
             </Link>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-muted-foreground">2.</span>
-            <Link href="/folha/corridas" className="underline text-foreground">
+            <Link href="/folha/corridas" className="text-primary underline">
               Abrir uma corrida de folha
             </Link>
           </div>
@@ -149,7 +149,7 @@ export default async function FolhaPage() {
           </div>
           <div className="flex items-center gap-2">
             <span className="text-muted-foreground">4.</span>
-            <Link href="/contas-pagar" className="underline text-foreground">
+            <Link href="/contas-pagar" className="text-primary underline">
               Aprovar e pagar via Contas a Pagar
             </Link>
           </div>

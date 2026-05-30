@@ -53,7 +53,7 @@ export default async function PJSpotPage() {
                   <Badge variant={p.ativo ? 'default' : 'secondary'}>{p.ativo ? 'Ativo' : 'Inativo'}</Badge>
                 </td>
                 <td className="px-4 py-3 text-right">
-                  <Link href={`/folha/pj-spot/${p.id}`} className="text-sm underline">Ver</Link>
+                  <Link href={`/folha/pj-spot/${p.id}`} className="text-sm text-primary underline">Ver</Link>
                 </td>
               </tr>
             ))}

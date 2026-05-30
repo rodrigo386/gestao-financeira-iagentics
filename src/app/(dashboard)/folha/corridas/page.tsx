@@ -156,7 +156,7 @@ export default async function CorridasPage({
                   <td className="px-4 py-3 text-right">{itemCountsMap[f.id] ?? 0}</td>
                   <td className="px-4 py-3 text-right">{formatBRL(totalBrutoMap[f.id] ?? 0)}</td>
                   <td className="px-4 py-3 text-right">
-                    <Link href={`/folha/corridas/${f.id}`} className="text-sm underline">
+                    <Link href={`/folha/corridas/${f.id}`} className="text-sm text-primary underline">
                       Ver
                     </Link>
                   </td>

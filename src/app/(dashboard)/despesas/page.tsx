@@ -102,10 +102,10 @@ export default async function DespesasPage() {
       <Card>
         <CardHeader><CardTitle>Próximos passos</CardTitle></CardHeader>
         <CardContent className="text-sm text-muted-foreground space-y-1">
-          <p>· <Link href="/despesas/fornecedores" className="underline">Cadastre fornecedores</Link> para vincular às despesas e APs</p>
-          <p>· <Link href="/despesas/recorrentes" className="underline">Configure despesas recorrentes</Link> (aluguel, assinaturas, salários) para geração automática de APs</p>
-          <p>· <Link href="/despesas/lancamentos" className="underline">Registre lançamentos</Link> de saída para acompanhar o fluxo real</p>
-          <p>· <Link href="/contas-pagar" className="underline">Gerencie contas a pagar</Link> — aprove, pague ou cancele previsões</p>
+          <p>· <Link href="/despesas/fornecedores" className="text-primary underline">Cadastre fornecedores</Link> para vincular às despesas e APs</p>
+          <p>· <Link href="/despesas/recorrentes" className="text-primary underline">Configure despesas recorrentes</Link> (aluguel, assinaturas, salários) para geração automática de APs</p>
+          <p>· <Link href="/despesas/lancamentos" className="text-primary underline">Registre lançamentos</Link> de saída para acompanhar o fluxo real</p>
+          <p>· <Link href="/contas-pagar" className="text-primary underline">Gerencie contas a pagar</Link> — aprove, pague ou cancele previsões</p>
         </CardContent>
       </Card>
     </div>

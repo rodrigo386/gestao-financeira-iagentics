@@ -27,7 +27,7 @@ export default async function FornecedorDetailPage({ params }: { params: Promise
       <section>
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-lg font-medium">Despesas recorrentes ({recorrentes.length})</h2>
-          <Link href={`/despesas/recorrentes/novo?fornecedor=${id}`} className="text-sm underline">+ Nova recorrente</Link>
+          <Link href={`/despesas/recorrentes/novo?fornecedor=${id}`} className="text-sm text-primary underline">+ Nova recorrente</Link>
         </div>
         {recorrentes.length === 0 ? (
           <p className="text-sm text-muted-foreground">Nenhuma despesa recorrente vinculada.</p>
@@ -55,7 +55,7 @@ export default async function FornecedorDetailPage({ params }: { params: Promise
                       <Badge variant={r.ativa ? 'default' : 'secondary'}>{r.ativa ? 'ativa' : 'inativa'}</Badge>
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <Link href={`/despesas/recorrentes/${r.id}`} className="text-sm underline">Ver</Link>
+                      <Link href={`/despesas/recorrentes/${r.id}`} className="text-sm text-primary underline">Ver</Link>
                     </td>
                   </tr>
                 ))}

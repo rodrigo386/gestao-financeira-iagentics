@@ -53,7 +53,7 @@ export default async function FuncionariosPage() {
                   <Badge variant={f.ativo ? 'default' : 'secondary'}>{f.ativo ? 'Ativo' : 'Inativo'}</Badge>
                 </td>
                 <td className="px-4 py-3 text-right">
-                  <Link href={`/folha/funcionarios/${f.id}`} className="text-sm underline">Ver</Link>
+                  <Link href={`/folha/funcionarios/${f.id}`} className="text-sm text-primary underline">Ver</Link>
                 </td>
               </tr>
             ))}
