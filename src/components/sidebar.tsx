@@ -21,8 +21,9 @@ const NAV = [
   { href: '/config',            label: 'Configurações' },
 ]
 
-export function Sidebar({ alertasUnread = 0 }: { alertasUnread?: number }) {
+export function Sidebar({ alertasUnread = 0, isAdmin = false }: { alertasUnread?: number; isAdmin?: boolean }) {
   const pathname = usePathname()
+  const nav = isAdmin ? [...NAV, { href: '/config/usuarios', label: 'Usuários' }] : NAV
   return (
     <aside className="w-64 border-r border-sidebar-border bg-sidebar text-sidebar-foreground min-h-screen p-4">
       <div className="mb-1 px-2 pt-1">
@@ -32,7 +33,7 @@ export function Sidebar({ alertasUnread = 0 }: { alertasUnread?: number }) {
         Gestão Financeira
       </div>
       <nav className="flex flex-col gap-1">
-        {NAV.map((item) => {
+        {nav.map((item) => {
           const active = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))
           return (
             <Link
