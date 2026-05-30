@@ -3,7 +3,11 @@ import { createServiceClient } from '@/lib/supabase/service'
 import { withAudit } from '@/lib/audit'
 import {
   CriarUsuarioSchema,
+  RedefinirSenhaSchema,
+  TrocarRoleSchema,
   type CriarUsuarioInput,
+  type RedefinirSenhaInput,
+  type TrocarRoleInput,
   type Actor,
   type UsuarioListItem,
 } from './types'
@@ -54,6 +58,76 @@ export async function criarUsuario(input: CriarUsuarioInput, actor: Actor): Prom
         throw new Error(`criarUsuario (usuarios): ${error.message}`)
       }
       return { id }
+    },
+  )
+}
+
+export async function redefinirSenha(input: RedefinirSenhaInput, actor: Actor): Promise<void> {
+  requireAdmin(actor)
+  const { userId, novaSenha } = RedefinirSenhaSchema.parse(input)
+  const admin = createServiceClient()
+  await withAudit(
+    {
+      usuario_id: actor.id,
+      acao: 'update',
+      tabela: 'usuarios',
+      registro_id: userId,
+      before: null,
+      after: { senha: '***' },
+      motivo: 'admin: redefinir senha',
+    },
+    async () => {
+      const { error } = await admin.auth.admin.updateUserById(userId, { password: novaSenha })
+      if (error) throw new Error(`redefinirSenha: ${error.message}`)
+    },
+  )
+}
+
+export async function trocarRole(input: TrocarRoleInput, actor: Actor): Promise<void> {
+  requireAdmin(actor)
+  const { userId, role } = TrocarRoleSchema.parse(input)
+  const admin = createServiceClient()
+  const { data: alvo } = await admin.from('usuarios').select('role').eq('id', userId).single()
+  if (alvo?.role === 'admin') throw new Error('não é possível alterar a role do admin')
+  await withAudit(
+    {
+      usuario_id: actor.id,
+      acao: 'update',
+      tabela: 'usuarios',
+      registro_id: userId,
+      before: { role: alvo?.role ?? null },
+      after: { role },
+      motivo: 'admin: trocar role',
+    },
+    async () => {
+      const { error } = await admin.from('usuarios').update({ role }).eq('id', userId)
+      if (error) throw new Error(`trocarRole: ${error.message}`)
+    },
+  )
+}
+
+export async function removerUsuario(userId: string, actor: Actor): Promise<void> {
+  requireAdmin(actor)
+  if (userId === actor.id) throw new Error('não é possível remover a si mesmo')
+  const admin = createServiceClient()
+  const { data: alvo } = await admin.from('usuarios').select('role').eq('id', userId).single()
+  if (alvo?.role === 'admin') throw new Error('não é possível remover o admin')
+  await withAudit(
+    {
+      usuario_id: actor.id,
+      acao: 'delete',
+      tabela: 'usuarios',
+      registro_id: userId,
+      before: { role: alvo?.role ?? null },
+      after: null,
+      motivo: 'admin: remover usuário',
+    },
+    async () => {
+      // ordem determinística: linha usuarios primeiro, depois o auth user
+      const { error: delRow } = await admin.from('usuarios').delete().eq('id', userId)
+      if (delRow) throw new Error(`removerUsuario (usuarios): ${delRow.message}`)
+      const { error: delAuth } = await admin.auth.admin.deleteUser(userId)
+      if (delAuth) throw new Error(`removerUsuario (auth): ${delAuth.message}`)
     },
   )
 }

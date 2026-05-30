@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { createClient } from '@supabase/supabase-js'
-import { criarUsuario, listarUsuarios } from '@/modules/usuarios/usuarios'
+import { criarUsuario, listarUsuarios, redefinirSenha, trocarRole, removerUsuario } from '@/modules/usuarios/usuarios'
 
 // O módulo usa createServiceClient, que lê estas envs. Forçar LOCAL.
 process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://127.0.0.1:54321'
@@ -15,13 +15,22 @@ function db() {
 }
 
 // Cria um usuário auth + linha usuarios com a role pedida; devolve um Actor válido.
+// Para role='admin': remove qualquer admin anterior (usuarios_admin_singleton impede múltiplos).
 async function makeUser(role: 'admin' | 'financeiro' | 'leitura') {
   const d = db()
+  if (role === 'admin') {
+    const { data: existingAdmins } = await d.from('usuarios').select('id').eq('role', 'admin')
+    for (const a of existingAdmins ?? []) {
+      await d.from('usuarios').delete().eq('id', a.id)
+      await d.auth.admin.deleteUser(a.id)
+    }
+  }
   const email = `${role}-${Date.now()}-${Math.floor(Math.random() * 1e6)}@iagentics.test`
   const { data, error } = await d.auth.admin.createUser({ email, password: 'seed-pass-123', email_confirm: true })
   if (error || !data.user) throw new Error(error?.message)
   const id = data.user.id
-  await d.from('usuarios').upsert({ id, nome: role, role }, { onConflict: 'id', ignoreDuplicates: false })
+  const { error: upsertErr } = await d.from('usuarios').upsert({ id, nome: role, role }, { onConflict: 'id', ignoreDuplicates: false })
+  if (upsertErr) throw new Error(`makeUser upsert failed: ${upsertErr.message}`)
   return { id, role, email }
 }
 
@@ -63,5 +72,48 @@ describe('listarUsuarios', () => {
     const lista = await listarUsuarios({ id: admin.id, role: 'admin' })
     expect(lista.some((u) => u.email && u.role)).toBe(true)
     await expect(listarUsuarios({ id: admin.id, role: 'leitura' })).rejects.toThrow(/admin/i)
+  })
+})
+
+describe('redefinirSenha', () => {
+  it('admin redefine a senha e o usuário loga com a nova', async () => {
+    const admin = await makeUser('admin')
+    const email = `pw-${Date.now()}@iagentics.test`
+    const { id } = await criarUsuario({ email, senha: 'senha-antiga-1', nome: 'PW', role: 'leitura' }, { id: admin.id, role: 'admin' })
+
+    await redefinirSenha({ userId: id, novaSenha: 'senha-nova-9' }, { id: admin.id, role: 'admin' })
+
+    const anon = createClient(URL, ANON, { auth: { persistSession: false, autoRefreshToken: false } })
+    const { error } = await anon.auth.signInWithPassword({ email, password: 'senha-nova-9' })
+    expect(error).toBeNull()
+  })
+})
+
+describe('trocarRole', () => {
+  it('troca entre financeiro/leitura e bloqueia mexer no admin', async () => {
+    const admin = await makeUser('admin')
+    const email = `role-${Date.now()}@iagentics.test`
+    const { id } = await criarUsuario({ email, senha: 'senha-1234', nome: 'R', role: 'leitura' }, { id: admin.id, role: 'admin' })
+
+    await trocarRole({ userId: id, role: 'financeiro' }, { id: admin.id, role: 'admin' })
+    const { data: row } = await db().from('usuarios').select('role').eq('id', id).single()
+    expect(row?.role).toBe('financeiro')
+
+    // não pode alterar a role do admin
+    await expect(trocarRole({ userId: admin.id, role: 'leitura' }, { id: admin.id, role: 'admin' })).rejects.toThrow(/admin/i)
+  })
+})
+
+describe('removerUsuario', () => {
+  it('remove auth + linha usuarios; bloqueia remover a si mesmo e o admin', async () => {
+    const admin = await makeUser('admin')
+    const email = `rm-${Date.now()}@iagentics.test`
+    const { id } = await criarUsuario({ email, senha: 'senha-1234', nome: 'RM', role: 'leitura' }, { id: admin.id, role: 'admin' })
+
+    await removerUsuario(id, { id: admin.id, role: 'admin' })
+    const { data: row } = await db().from('usuarios').select('id').eq('id', id).maybeSingle()
+    expect(row).toBeNull()
+
+    await expect(removerUsuario(admin.id, { id: admin.id, role: 'admin' })).rejects.toThrow(/si mesmo/i)
   })
 })
