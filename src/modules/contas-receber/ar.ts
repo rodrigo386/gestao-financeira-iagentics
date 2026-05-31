@@ -2,6 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { NewContaAReceber, ContaAReceber } from '@/lib/schemas/ar'
 import { withAudit } from '@/lib/audit'
+import { gerarARDoContrato } from './gerador'
+import type { Contrato } from '@/lib/schemas/contrato'
 import type { z } from 'zod'
 
 export type ListARParams = {
@@ -109,6 +111,30 @@ export async function cancelarAR(id: string, motivo: string, usuarioId: string) 
       return data as ContaAReceber
     },
   )
+}
+
+/**
+ * Generates AR (status 'previsto') for the given reference month for ALL active
+ * contracts, skipping any that already exist (dedup via the unique index).
+ * Shared by the monthly cron and the on-demand "Gerar AR do mês" button.
+ *
+ * `refMonth` is the first day of the month, "YYYY-MM-01". Contracts whose
+ * `data_inicio` is after `refMonth` (future) or that ended before it produce no AR.
+ */
+export async function gerarARMes(refMonth: string) {
+  const admin = createServiceClient()
+  const { data: contratos, error } = await admin
+    .from('contratos')
+    .select('*')
+    .eq('status', 'ativo')
+  if (error) throw new Error(`gerarARMes: ${error.message}`)
+
+  const novos = (contratos as Contrato[])
+    .map((c) => gerarARDoContrato(c, refMonth))
+    .filter((x): x is NonNullable<typeof x> => x !== null)
+
+  const result = await inserirARBatch(novos)
+  return { refMonth, contratos_ativos: contratos?.length ?? 0, ...result }
 }
 
 /**
