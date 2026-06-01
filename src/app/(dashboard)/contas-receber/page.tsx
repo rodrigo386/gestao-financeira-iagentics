@@ -1,8 +1,10 @@
 import { revalidatePath } from 'next/cache'
-import { listarAR, gerarARMes } from '@/modules/contas-receber/ar'
+import { listarAR, gerarARMes, atualizarAR } from '@/modules/contas-receber/ar'
 import { createClient } from '@/lib/supabase/server'
 import { withAudit } from '@/lib/audit'
 import { ARTable } from '@/components/ar-table'
+import type { ARPatch } from '@/components/ar-edit-dialog'
+import type { AtualizarARPatch } from '@/lib/schemas/ar'
 import { GerarARButton, type GerarARResult } from '@/components/gerar-ar-button'
 
 export default async function ContasReceberPage() {
@@ -38,6 +40,17 @@ export default async function ContasReceberPage() {
     return result
   }
 
+  async function editarARAction(id: string, patch: ARPatch) {
+    'use server'
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('não autenticado')
+    const { data: u } = await supabase.from('usuarios').select('role').eq('id', user.id).single()
+    if (!u || !['admin', 'financeiro'].includes(u.role)) throw new Error('sem permissão para editar AR')
+    await atualizarAR(id, patch as AtualizarARPatch, user.id)
+    revalidatePath('/contas-receber')
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -50,7 +63,7 @@ export default async function ContasReceberPage() {
         </p>
         <GerarARButton onGerar={gerarAction} />
       </div>
-      <ARTable rows={typed} />
+      <ARTable rows={typed} onEditar={editarARAction} />
     </div>
   )
 }
