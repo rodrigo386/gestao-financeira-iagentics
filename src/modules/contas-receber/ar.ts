@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
-import { NewContaAReceber, ContaAReceber } from '@/lib/schemas/ar'
+import { NewContaAReceber, ContaAReceber, AtualizarARPatch } from '@/lib/schemas/ar'
 import { withAudit } from '@/lib/audit'
 import { gerarARDoContrato } from './gerador'
 import type { Contrato } from '@/lib/schemas/contrato'
@@ -159,4 +159,47 @@ export async function inserirARBatch(rows: z.input<typeof NewContaAReceber>[]) {
     inserted++
   }
   return { inserted, skipped }
+}
+
+/**
+ * Edita datas/valor/status de uma AR (ajuste manual realidade × planejado).
+ * Usa service client (gate de papel é feito na camada de app). Audita.
+ * Rejeita editar AR já 'recebido' (liquidada com lançamento).
+ */
+export async function atualizarAR(
+  id: string,
+  patch: z.input<typeof AtualizarARPatch>,
+  usuarioId: string,
+): Promise<ContaAReceber> {
+  const parsed = AtualizarARPatch.parse(patch)
+  const admin = createServiceClient()
+  const { data: before, error: bErr } = await admin
+    .from('contas_a_receber').select('*').eq('id', id).single()
+  if (bErr || !before) throw new Error('AR não encontrada')
+  const atual = before as ContaAReceber
+  if (atual.status === 'recebido') {
+    throw new Error('AR recebida não pode ser editada; cancele o recebimento primeiro')
+  }
+  const merged = {
+    data_emissao: parsed.data_emissao ?? atual.data_emissao,
+    data_vencimento: parsed.data_vencimento ?? atual.data_vencimento,
+    valor: parsed.valor ?? atual.valor,
+    status: parsed.status ?? atual.status,
+  }
+  if (merged.data_vencimento < merged.data_emissao) {
+    throw new Error('data_vencimento deve ser >= data_emissao')
+  }
+  return withAudit(
+    {
+      usuario_id: usuarioId, acao: 'update', tabela: 'contas_a_receber', registro_id: id,
+      before: atual as unknown as Record<string, unknown>, after: merged as Record<string, unknown>,
+      motivo: 'editar AR (datas/valor/status)',
+    },
+    async () => {
+      const { data, error } = await admin
+        .from('contas_a_receber').update(merged).eq('id', id).select().single()
+      if (error) throw new Error(`atualizarAR: ${error.message}`)
+      return data as ContaAReceber
+    },
+  )
 }

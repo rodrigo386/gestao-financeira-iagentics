@@ -26,6 +26,14 @@ export const NewContaAReceber = z.object({
     { message: 'data_vencimento must be on or after data_emissao', path: ['data_vencimento'] },
   )
 
+export const AtualizarARPatch = z.object({
+  data_emissao: DateStr.optional(),
+  data_vencimento: DateStr.optional(),
+  valor: Money.refine((v) => v > 0, 'valor deve ser > 0').optional(),
+  status: z.enum(['previsto', 'emitido', 'atrasado', 'cancelado']).optional(),
+})
+export type AtualizarARPatch = z.infer<typeof AtualizarARPatch>
+
 export const ContaAReceber = z.object({
   id: Uuid,
   cliente_id: Uuid,
