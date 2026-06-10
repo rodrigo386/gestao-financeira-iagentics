@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import { AREditDialog, type ARPatch } from '@/components/ar-edit-dialog'
+import { ARReceberDialog, type ReceberInput } from '@/components/ar-receber-dialog'
 
 type ARRow = {
   id: string
@@ -22,7 +23,13 @@ const STATUS_VARIANT: Record<ARRow['status'], 'default' | 'secondary' | 'destruc
   cancelado: 'secondary',
 }
 
-export function ARTable({ rows, onEditar }: { rows: ARRow[]; onEditar?: (id: string, patch: ARPatch) => Promise<void> }) {
+export function ARTable({ rows, onEditar, onMarcarRecebido, contas = [], categoriasReceita = [] }: {
+  rows: ARRow[]
+  onEditar?: (id: string, patch: ARPatch) => Promise<void>
+  onMarcarRecebido?: (id: string, input: ReceberInput) => Promise<void>
+  contas?: { id: string; banco: string }[]
+  categoriasReceita?: { id: string; nome: string }[]
+}) {
   if (rows.length === 0) {
     return <p className="text-sm text-muted-foreground">Nenhuma conta a receber.</p>
   }
@@ -43,7 +50,7 @@ export function ARTable({ rows, onEditar }: { rows: ARRow[]; onEditar?: (id: str
               <th className="px-4 py-3">Vencimento</th>
               <th className="px-4 py-3 text-right">Valor</th>
               <th className="px-4 py-3">Status</th>
-              {onEditar && <th className="px-4 py-3 text-right">Ações</th>}
+              {(onEditar || onMarcarRecebido) && <th className="px-4 py-3 text-right">Ações</th>}
             </tr>
           </thead>
           <tbody>
@@ -59,12 +66,17 @@ export function ARTable({ rows, onEditar }: { rows: ARRow[]; onEditar?: (id: str
                 <td className="px-4 py-3">{r.data_vencimento}</td>
                 <td className="px-4 py-3 text-right">R$ {r.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
                 <td className="px-4 py-3"><Badge variant={STATUS_VARIANT[r.status]}>{r.status}</Badge></td>
-                {onEditar && (
-                  <td className="px-4 py-3 text-right">
-                    <AREditDialog
-                      row={{ id: r.id, data_emissao: r.data_emissao, data_vencimento: r.data_vencimento, valor: r.valor, status: r.status }}
-                      onSalvar={onEditar}
-                    />
+                {(onEditar || onMarcarRecebido) && (
+                  <td className="px-4 py-3 text-right space-x-2">
+                    {onMarcarRecebido && r.status !== 'recebido' && r.status !== 'cancelado' && (
+                      <ARReceberDialog arId={r.id} contas={contas} categorias={categoriasReceita} onReceber={onMarcarRecebido} />
+                    )}
+                    {onEditar && (
+                      <AREditDialog
+                        row={{ id: r.id, data_emissao: r.data_emissao, data_vencimento: r.data_vencimento, valor: r.valor, status: r.status }}
+                        onSalvar={onEditar}
+                      />
+                    )}
                   </td>
                 )}
               </tr>

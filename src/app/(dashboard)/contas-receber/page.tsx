@@ -1,9 +1,10 @@
 import { revalidatePath } from 'next/cache'
-import { listarAR, gerarARMes, atualizarAR } from '@/modules/contas-receber/ar'
+import { listarAR, gerarARMes, atualizarAR, marcarRecebido } from '@/modules/contas-receber/ar'
 import { createClient } from '@/lib/supabase/server'
 import { withAudit } from '@/lib/audit'
 import { ARTable } from '@/components/ar-table'
 import type { ARPatch } from '@/components/ar-edit-dialog'
+import type { ReceberInput } from '@/components/ar-receber-dialog'
 import type { AtualizarARPatch } from '@/lib/schemas/ar'
 import { GerarARButton, type GerarARResult } from '@/components/gerar-ar-button'
 
@@ -51,6 +52,23 @@ export default async function ContasReceberPage() {
     revalidatePath('/contas-receber')
   }
 
+  async function marcarRecebidoAction(id: string, input: ReceberInput) {
+    'use server'
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('não autenticado')
+    const { data: u } = await supabase.from('usuarios').select('role').eq('id', user.id).single()
+    if (!u || !['admin', 'financeiro'].includes(u.role)) throw new Error('sem permissão para marcar recebido')
+    await marcarRecebido(id, input.dataRecebimento, input.contaId, input.categoriaId, user.id)
+    revalidatePath('/contas-receber')
+  }
+
+  const supabaseRead = await createClient()
+  const [{ data: contasAtivas }, { data: catsReceita }] = await Promise.all([
+    supabaseRead.from('contas_bancarias').select('id, banco').eq('ativa', true).order('banco'),
+    supabaseRead.from('categorias').select('id, nome').eq('tipo', 'receita').eq('ativa', true).order('nome'),
+  ])
+
   return (
     <div className="space-y-6">
       <div>
@@ -63,7 +81,13 @@ export default async function ContasReceberPage() {
         </p>
         <GerarARButton onGerar={gerarAction} />
       </div>
-      <ARTable rows={typed} onEditar={editarARAction} />
+      <ARTable
+        rows={typed}
+        onEditar={editarARAction}
+        onMarcarRecebido={marcarRecebidoAction}
+        contas={contasAtivas ?? []}
+        categoriasReceita={catsReceita ?? []}
+      />
     </div>
   )
 }
