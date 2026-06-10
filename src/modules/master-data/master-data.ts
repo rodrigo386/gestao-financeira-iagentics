@@ -14,7 +14,7 @@ export async function listarEntidade(key: string, busca?: string): Promise<Recor
   if (busca && busca.trim()) q = q.ilike(ent.buscaCampo, `%${busca.trim()}%`)
   const { data, error } = await q
   if (error) throw new Error(`listarEntidade(${key}): ${error.message}`)
-  return (data ?? []) as Record<string, unknown>[]
+  return (data ?? []) as unknown as Record<string, unknown>[]
 }
 
 export async function excluirEntidade(key: string, id: string, actor: Actor): Promise<void> {

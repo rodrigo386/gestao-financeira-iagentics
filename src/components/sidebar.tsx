@@ -23,7 +23,9 @@ const NAV = [
 
 export function Sidebar({ alertasUnread = 0, isAdmin = false }: { alertasUnread?: number; isAdmin?: boolean }) {
   const pathname = usePathname()
-  const nav = isAdmin ? [...NAV, { href: '/config/usuarios', label: 'Usuários' }] : NAV
+  const nav = isAdmin
+    ? [...NAV, { href: '/master-data', label: 'Master Data' }, { href: '/config/usuarios', label: 'Usuários' }]
+    : NAV
   return (
     <aside className="w-64 border-r border-sidebar-border bg-sidebar text-sidebar-foreground min-h-screen p-4">
       <div className="mb-1 px-2 pt-1">
