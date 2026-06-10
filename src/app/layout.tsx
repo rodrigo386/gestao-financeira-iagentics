@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Sora, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { ChunkReloadGuard } from '@/components/chunk-reload-guard'
 
 const sora = Sora({
   variable: "--font-sans",
@@ -29,7 +30,10 @@ export default function RootLayout({
       lang="pt-BR"
       className={`${sora.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
-      <body className="dark terminal-surface min-h-full flex flex-col">{children}</body>
+      <body className="dark terminal-surface min-h-full flex flex-col">
+        <ChunkReloadGuard />
+        {children}
+      </body>
     </html>
   );
 }
