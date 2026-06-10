@@ -13,6 +13,7 @@ export default async function ConfigPage() {
 
   const itens: { href: string; titulo: string; desc: string }[] = [
     { href: '/config/bancos', titulo: 'Bancos', desc: 'Contas bancárias e sincronização' },
+    { href: '/config/contas-bancarias', titulo: 'Contas Bancárias', desc: 'Cadastrar contas e ajustar saldo (alimenta o caixa)' },
     { href: '/config/regras-categorizacao', titulo: 'Regras de Categorização', desc: 'Padrões → categoria automática' },
   ]
   if (isAdmin) {
