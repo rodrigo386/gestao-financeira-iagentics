@@ -78,4 +78,15 @@ describe('atualizarAR', () => {
     }).select().single()
     await expect(atualizarAR(ar!.id, { valor: 2000 }, userId)).rejects.toThrow(/recebida/i)
   })
+
+  it('bloqueia usuário sem permissão de escrita (leitura)', async () => {
+    const d = db()
+    const { data: u } = await d.auth.admin.createUser({
+      email: `ar-leitura-${Date.now()}-${Math.floor(Math.random() * 1e6)}@iagentics.test`,
+      password: 'seed-pass-123', email_confirm: true,
+    })
+    await d.from('usuarios').upsert({ id: u.user!.id, nome: 'Leitor', role: 'leitura' }, { onConflict: 'id' })
+    const { arId } = await seedAR()
+    await expect(atualizarAR(arId, { valor: 1234 }, u.user!.id)).rejects.toThrow(/permiss/i)
+  })
 })

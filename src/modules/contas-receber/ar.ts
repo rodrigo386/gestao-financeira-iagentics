@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { NewContaAReceber, ContaAReceber, AtualizarARPatch } from '@/lib/schemas/ar'
 import { withAudit } from '@/lib/audit'
+import { requireCanWrite } from '@/lib/authz'
 import { gerarARDoContrato } from './gerador'
 import type { Contrato } from '@/lib/schemas/contrato'
 import type { z } from 'zod'
@@ -172,6 +173,7 @@ export async function atualizarAR(
   usuarioId: string,
 ): Promise<ContaAReceber> {
   const parsed = AtualizarARPatch.parse(patch)
+  await requireCanWrite(usuarioId)
   const admin = createServiceClient()
   const { data: before, error: bErr } = await admin
     .from('contas_a_receber').select('*').eq('id', id).single()
