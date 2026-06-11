@@ -4,6 +4,8 @@ import { NewContaAPagar, ContaAPagar } from '@/lib/schemas/ap'
 import { withAudit } from '@/lib/audit'
 import { criarLancamento, buildLancamentoFromAP } from '@/modules/despesas/lancamentos'
 import type { z } from 'zod'
+import { gerarAPDeRecorrente, proximaGeracao } from './gerador'
+import type { DespesaRecorrente } from '@/lib/schemas/despesa_recorrente'
 
 export type ListAPParams = {
   status?: 'previsto' | 'aprovado' | 'pago' | 'atrasado' | 'cancelado'
@@ -148,4 +150,36 @@ export async function inserirAPBatch(rows: z.input<typeof NewContaAPagar>[]) {
     inserted++
   }
   return { inserted, skipped }
+}
+
+/**
+ * Gera AP (status 'previsto') do mês de referência para TODAS as despesas
+ * recorrentes ativas, pulando as que já existem (dedup via índice único).
+ * Atualiza `proxima_geracao` das que geraram. Compartilhado pelo cron mensal
+ * e pelo botão "Gerar AP" do Fechamento. `refMonth` = "YYYY-MM-01".
+ */
+export async function gerarAPMes(refMonth: string) {
+  const admin = createServiceClient()
+  const { data: recorrentes, error } = await admin
+    .from('despesas_recorrentes')
+    .select('*')
+    .eq('ativa', true)
+  if (error) throw new Error(`gerarAPMes: ${error.message}`)
+
+  const recs = recorrentes as DespesaRecorrente[]
+  const novos = recs
+    .map((r) => gerarAPDeRecorrente(r, refMonth))
+    .filter((x): x is NonNullable<typeof x> => x !== null)
+
+  const result = await inserirAPBatch(novos)
+
+  // Atualiza proxima_geracao das recorrentes que geraram AP neste mês
+  for (const r of recs) {
+    if (gerarAPDeRecorrente(r, refMonth) !== null) {
+      const next = proximaGeracao(refMonth, r.dia_mes)
+      await admin.from('despesas_recorrentes').update({ proxima_geracao: next }).eq('id', r.id)
+    }
+  }
+
+  return { refMonth, recorrentes_ativas: recs.length, ...result }
 }
