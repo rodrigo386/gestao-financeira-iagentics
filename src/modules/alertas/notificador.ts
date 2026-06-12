@@ -1,6 +1,7 @@
 import 'server-only'
 import { createServiceClient } from '@/lib/supabase/service'
 import { sendAlertaEmail } from '@/lib/email/client'
+import { postSlack } from '@/lib/slack/client'
 import type { NewAlerta } from '@/lib/schemas/alerta'
 
 /**
@@ -25,8 +26,18 @@ export async function notificarAlerta(input: NewAlerta) {
   const { data: alerta, error } = await admin.from('alertas').insert(input).select().single()
   if (error) throw new Error(`notificarAlerta insert: ${error.message}`)
 
-  // Email if warning/critical
+  // Notifica canais se warning/critical (Slack é o canal real; e-mail fica em mock)
   if (input.severidade === 'warning' || input.severidade === 'critical') {
+    try {
+      await postSlack({
+        titulo: input.titulo,
+        mensagem: input.mensagem,
+        severidade: input.severidade,
+        contexto: input.contexto_json,
+      })
+    } catch (e) {
+      console.error('alerta slack failed (continuing):', e)
+    }
     try {
       await sendAlertaEmail({
         subject: `[${input.severidade.toUpperCase()}] ${input.titulo}`,
