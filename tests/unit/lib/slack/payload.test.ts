@@ -16,9 +16,10 @@ describe('buildSlackPayload', () => {
       titulo: 'Resumo', mensagem: 'Hoje', linhas: ['linha A', 'linha B'], contexto: { x: 1 },
     })
     const blocks = p.attachments[0].blocks as Array<Record<string, any>>
-    const texts = blocks.map((b) => JSON.stringify(b))
-    expect(texts.some((t) => t.includes('linha A'))).toBe(true)
-    expect(texts.some((t) => t.includes('"x":1'))).toBe(true)
+    expect(blocks.some((b) => b.type === 'section' && b.text.text.includes('linha A'))).toBe(true)
+    const ctx = blocks.find((b) => b.type === 'context')
+    expect(ctx).toBeTruthy()
+    expect(ctx!.elements[0].text).toContain('"x":1')
   })
 
   it('default severidade info → cor azul', () => {

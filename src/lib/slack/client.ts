@@ -28,7 +28,6 @@ export function buildSlackPayload(input: SlackInput) {
     blocks.push({
       type: 'context',
       elements: [{ type: 'mrkdwn', text: '```' + JSON.stringify(input.contexto) + '```' }],
-      _data: input.contexto,
     })
   }
   return { attachments: [{ color: colorOf(sev), blocks }] }
