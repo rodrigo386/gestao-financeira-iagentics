@@ -37,7 +37,15 @@ export default async function FuncionarioDetailPage({ params }: { params: Promis
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold">{funcionario.nome}</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-semibold">{funcionario.nome}</h1>
+          <Link
+            href={`/folha/funcionarios/${id}/editar`}
+            className="ml-auto rounded-md border border-border px-3 py-1.5 text-sm text-primary hover:bg-accent"
+          >
+            Editar
+          </Link>
+        </div>
         <div className="flex gap-3 items-center mt-2">
           <Badge variant="outline">{funcionario.tipo === 'clt' ? 'CLT' : 'PJ Recorrente'}</Badge>
           <Badge variant={funcionario.ativo ? 'default' : 'secondary'}>
