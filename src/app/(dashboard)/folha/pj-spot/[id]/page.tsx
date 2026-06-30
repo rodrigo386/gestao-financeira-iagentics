@@ -1,21 +1,16 @@
 import { notFound, redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
-import { buscarPJSpot, listarAlocacoes, criarAlocacao, concluirAlocacao } from '@/modules/folha/pj-spot'
+import { buscarPJSpot, listarAlocacoes, criarAlocacao, concluirAlocacao, atualizarAlocacao } from '@/modules/folha/pj-spot'
 import { listarProjetos } from '@/modules/receitas/projetos'
 import { createClient } from '@/lib/supabase/server'
+import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { AlocacaoForm, AlocacaoFormData } from '@/components/forms/alocacao-form'
+import { AlocacaoRow } from '@/components/alocacao-row'
 
 function formatBRL(val: number) {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val)
-}
-
-const STATUS_VARIANT: Record<string, 'default' | 'secondary' | 'outline' | 'destructive'> = {
-  contratado: 'outline',
-  em_andamento: 'default',
-  concluido: 'secondary',
-  pago: 'secondary',
 }
 
 type Props = { params: Promise<{ id: string }> }
@@ -55,14 +50,36 @@ export default async function PJSpotDetailPage({ params }: Props) {
     redirect(`/folha/pj-spot/${id}`)
   }
 
+  async function editarAlocacaoAction(alocacaoId: string, patch: Partial<AlocacaoFormData>) {
+    'use server'
+    await atualizarAlocacao(alocacaoId, {
+      projeto_id: patch.projeto_id?.trim() || undefined,
+      descricao: patch.descricao,
+      tipo_remuneracao: patch.tipo_remuneracao,
+      valor_total: patch.valor_total,
+      horas_estimadas: patch.horas_estimadas,
+      data_inicio: patch.data_inicio,
+      data_prevista_fim: patch.data_prevista_fim,
+    })
+    revalidatePath(`/folha/pj-spot/${id}`)
+  }
+
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold">{pj.nome}</h1>
-        <div className="flex gap-3 items-center mt-2">
-          <Badge variant={pj.ativo ? 'default' : 'secondary'}>{pj.ativo ? 'Ativo' : 'Inativo'}</Badge>
-          {pj.especialidade && <span className="text-sm text-muted-foreground">{pj.especialidade}</span>}
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold">{pj.nome}</h1>
+          <div className="flex gap-3 items-center mt-2">
+            <Badge variant={pj.ativo ? 'default' : 'secondary'}>{pj.ativo ? 'Ativo' : 'Inativo'}</Badge>
+            {pj.especialidade && <span className="text-sm text-muted-foreground">{pj.especialidade}</span>}
+          </div>
         </div>
+        <Link
+          href={`/folha/pj-spot/${id}/editar`}
+          className="ml-auto rounded-md border border-border px-3 py-1.5 text-sm text-primary hover:bg-accent"
+        >
+          Editar PJ
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -118,37 +135,30 @@ export default async function PJSpotDetailPage({ params }: Props) {
                   <th className="px-4 py-3">Valor Total</th>
                   <th className="px-4 py-3">Status</th>
                   <th className="px-4 py-3">Período</th>
-                  <th className="px-4 py-3"></th>
+                  <th className="px-4 py-3 text-right">Ações</th>
                 </tr>
               </thead>
               <tbody>
                 {alocacoes.map((a) => (
-                  <tr key={a.id} className="border-t">
-                    <td className="px-4 py-3 font-medium">{a.descricao}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{a.tipo_remuneracao}</td>
-                    <td className="px-4 py-3">{formatBRL(a.valor_total)}</td>
-                    <td className="px-4 py-3">
-                      <Badge variant={STATUS_VARIANT[a.status] ?? 'outline'}>{a.status}</Badge>
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground text-xs">
-                      {a.data_inicio} → {a.data_prevista_fim}
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      {a.status === 'concluido' && !a.ap_id && (
-                        <form action={async () => {
-                          'use server'
-                          await handleFaturar(a.id, a.data_prevista_fim)
-                        }}>
-                          <button
-                            type="submit"
-                            className="text-xs text-primary underline"
-                          >
-                            Faturar (gerar AP)
-                          </button>
-                        </form>
-                      )}
-                    </td>
-                  </tr>
+                  <AlocacaoRow
+                    key={a.id}
+                    alocacao={{
+                      id: a.id,
+                      pj_id: a.pj_id,
+                      projeto_id: a.projeto_id ?? undefined,
+                      descricao: a.descricao,
+                      tipo_remuneracao: a.tipo_remuneracao,
+                      valor_total: a.valor_total,
+                      horas_estimadas: a.horas_estimadas ?? undefined,
+                      data_inicio: a.data_inicio,
+                      data_prevista_fim: a.data_prevista_fim,
+                      status: a.status,
+                      ap_id: a.ap_id ?? undefined,
+                    }}
+                    projetos={projetos}
+                    onEditar={editarAlocacaoAction}
+                    onFaturar={handleFaturar}
+                  />
                 ))}
               </tbody>
             </table>
