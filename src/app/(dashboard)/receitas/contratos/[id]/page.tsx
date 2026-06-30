@@ -23,6 +23,12 @@ export default async function ContratoDetailPage({ params }: { params: Promise<{
         <div className="flex items-center gap-3">
           <h1 className="text-2xl font-semibold">{contrato.nome}</h1>
           <Badge variant={badgeVariant(contrato.status)}>{contrato.status}</Badge>
+          <Link
+            href={`/receitas/contratos/${id}/editar`}
+            className="ml-auto rounded-md border border-border px-3 py-1.5 text-sm text-primary hover:bg-accent"
+          >
+            Editar
+          </Link>
         </div>
         {cliente && (
           <p className="mt-1 text-sm text-muted-foreground">
