@@ -10,11 +10,19 @@ export default async function RecorrenteDetailPage({ params }: { params: Promise
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">{recorrente.descricao}</h1>
-        <div className="flex gap-4 text-sm text-muted-foreground mt-2 flex-wrap">
-          <Badge variant={recorrente.ativa ? 'default' : 'secondary'}>{recorrente.ativa ? 'ativa' : 'inativa'}</Badge>
+      <div className="flex items-start gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold">{recorrente.descricao}</h1>
+          <div className="flex gap-4 text-sm text-muted-foreground mt-2 flex-wrap">
+            <Badge variant={recorrente.ativa ? 'default' : 'secondary'}>{recorrente.ativa ? 'ativa' : 'inativa'}</Badge>
+          </div>
         </div>
+        <Link
+          href={`/despesas/recorrentes/${id}/editar`}
+          className="ml-auto rounded-md border border-border px-3 py-1.5 text-sm text-primary hover:bg-accent"
+        >
+          Editar
+        </Link>
       </div>
 
       <div className="border rounded-md p-4 space-y-3 max-w-xl text-sm">
