@@ -1,7 +1,8 @@
 import { notFound } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import Link from 'next/link'
-import { buscarProjeto, listarMilestones, criarMilestone } from '@/modules/receitas/projetos'
+import { buscarProjeto, listarMilestones, criarMilestone, atualizarMilestone } from '@/modules/receitas/projetos'
+import { MilestoneRow, type MilestonePatch } from '@/components/milestone-row'
 import { buscarCliente } from '@/modules/receitas/clientes'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -36,6 +37,12 @@ export default async function ProjetoDetailPage({ params }: { params: Promise<{ 
     const valor = parseFloat(formData.get('valor') as string) || 0
     const data_prevista = formData.get('data_prevista') as string
     await criarMilestone({ projeto_id: id, ordem, descricao, valor, data_prevista })
+    revalidatePath(`/receitas/projetos/${id}`)
+  }
+
+  async function editarMilestoneAction(milestoneId: string, patch: MilestonePatch) {
+    'use server'
+    await atualizarMilestone(milestoneId, patch)
     revalidatePath(`/receitas/projetos/${id}`)
   }
 
@@ -110,27 +117,25 @@ export default async function ProjetoDetailPage({ params }: { params: Promise<{ 
                 <th className="px-4 py-3">Valor</th>
                 <th className="px-4 py-3">Data prevista</th>
                 <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3 text-right">Ações</th>
               </tr>
             </thead>
             <tbody>
               {milestones.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-6 text-center text-muted-foreground">
+                  <td colSpan={6} className="px-4 py-6 text-center text-muted-foreground">
                     Nenhum milestone ainda.
                   </td>
                 </tr>
               ) : milestones.map((m) => (
-                <tr key={m.id} className="border-t">
-                  <td className="px-4 py-3 text-muted-foreground">{m.ordem}</td>
-                  <td className="px-4 py-3 font-medium">{m.descricao}</td>
-                  <td className="px-4 py-3 text-muted-foreground">
-                    R$ {m.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                  </td>
-                  <td className="px-4 py-3 text-muted-foreground">{m.data_prevista}</td>
-                  <td className="px-4 py-3">
-                    <Badge variant={milestoneBadgeVariant(m.status)}>{m.status}</Badge>
-                  </td>
-                </tr>
+                <MilestoneRow
+                  key={m.id}
+                  milestone={{
+                    id: m.id, ordem: m.ordem, descricao: m.descricao,
+                    valor: m.valor, data_prevista: m.data_prevista, status: m.status,
+                  }}
+                  onEditar={editarMilestoneAction}
+                />
               ))}
             </tbody>
           </table>
