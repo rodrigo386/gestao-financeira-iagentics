@@ -14,7 +14,15 @@ export default async function FornecedorDetailPage({ params }: { params: Promise
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold">{fornecedor.nome}</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-semibold">{fornecedor.nome}</h1>
+          <Link
+            href={`/despesas/fornecedores/${id}/editar`}
+            className="ml-auto rounded-md border border-border px-3 py-1.5 text-sm text-primary hover:bg-accent"
+          >
+            Editar
+          </Link>
+        </div>
         <div className="flex gap-4 text-sm text-muted-foreground mt-2 flex-wrap">
           {fornecedor.cnpj && <span>CNPJ: {fornecedor.cnpj}</span>}
           <Badge variant={fornecedor.ativo ? 'default' : 'secondary'}>{fornecedor.ativo ? 'ativo' : 'inativo'}</Badge>
