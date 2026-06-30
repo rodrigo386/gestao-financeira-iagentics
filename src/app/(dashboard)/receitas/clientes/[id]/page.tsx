@@ -17,7 +17,15 @@ export default async function ClienteDetailPage({ params }: { params: Promise<{ 
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold">{cliente.nome}</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-semibold">{cliente.nome}</h1>
+          <Link
+            href={`/receitas/clientes/${id}/editar`}
+            className="ml-auto rounded-md border border-border px-3 py-1.5 text-sm text-primary hover:bg-accent"
+          >
+            Editar cliente
+          </Link>
+        </div>
         <div className="flex gap-4 text-sm text-muted-foreground mt-2">
           {cliente.cnpj && <span>CNPJ: {cliente.cnpj}</span>}
           {cliente.segmento && <span>Segmento: {cliente.segmento}</span>}
