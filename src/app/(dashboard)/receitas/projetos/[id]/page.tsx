@@ -15,10 +15,6 @@ function badgeVariant(status: string): 'default' | 'secondary' | 'destructive' {
   return 'secondary'
 }
 
-function milestoneBadgeVariant(status: string): 'default' | 'secondary' | 'destructive' {
-  if (status === 'concluido' || status === 'faturado' || status === 'pago') return 'default'
-  return 'secondary'
-}
 
 export default async function ProjetoDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -53,6 +49,12 @@ export default async function ProjetoDetailPage({ params }: { params: Promise<{ 
         <div className="flex items-center gap-3">
           <h1 className="text-2xl font-semibold">{projeto.nome}</h1>
           <Badge variant={badgeVariant(projeto.status)}>{projeto.status}</Badge>
+          <Link
+            href={`/receitas/projetos/${id}/editar`}
+            className="ml-auto rounded-md border border-border px-3 py-1.5 text-sm text-primary hover:bg-accent"
+          >
+            Editar projeto
+          </Link>
         </div>
         {cliente && (
           <p className="mt-1 text-sm text-muted-foreground">
