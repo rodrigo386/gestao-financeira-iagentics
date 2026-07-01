@@ -1,8 +1,9 @@
 import Link from 'next/link'
 import { revalidatePath } from 'next/cache'
-import { listarClientes, criarCliente } from '@/modules/receitas/clientes'
+import { listarClientes, criarCliente, atualizarCliente } from '@/modules/receitas/clientes'
 import { Badge } from '@/components/ui/badge'
 import { NovoClienteDialog } from '@/components/cadastro/novo-cliente-dialog'
+import { EditarClienteDialog } from '@/components/cadastro/editar-cliente-dialog'
 
 export default async function ClientesPage() {
   const { data, total } = await listarClientes({ limit: 100 })
@@ -10,6 +11,12 @@ export default async function ClientesPage() {
   async function criarClienteAction(input: { nome: string; contato_email?: string }) {
     'use server'
     await criarCliente({ nome: input.nome, contato_email: input.contato_email, moeda_padrao: 'BRL' })
+    revalidatePath('/receitas/clientes')
+  }
+
+  async function editarClienteAction(id: string, patch: { nome: string; contato_email?: string; status: 'ativo' | 'inativo' | 'churned' }) {
+    'use server'
+    await atualizarCliente(id, patch)
     revalidatePath('/receitas/clientes')
   }
 
@@ -50,7 +57,10 @@ export default async function ClientesPage() {
                   <Badge variant={c.status === 'ativo' ? 'default' : 'secondary'}>{c.status}</Badge>
                 </td>
                 <td className="px-4 py-3 text-right">
-                  <Link href={`/receitas/clientes/${c.id}`} className="text-sm text-primary underline">Ver</Link>
+                  <div className="flex items-center justify-end gap-2">
+                    <EditarClienteDialog initial={{ id: c.id, nome: c.nome, contato_email: c.contato_email, status: c.status }} onSalvar={editarClienteAction} />
+                    <Link href={`/receitas/clientes/${c.id}`} className="text-sm text-primary underline">Ver</Link>
+                  </div>
                 </td>
               </tr>
             ))}

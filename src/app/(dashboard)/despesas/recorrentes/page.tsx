@@ -1,9 +1,10 @@
 import Link from 'next/link'
 import { revalidatePath } from 'next/cache'
-import { listarRecorrentes, criarRecorrente } from '@/modules/despesas/recorrentes'
+import { listarRecorrentes, criarRecorrente, atualizarRecorrente } from '@/modules/despesas/recorrentes'
 import { listarFornecedores, criarFornecedor } from '@/modules/despesas/fornecedores'
 import { Badge } from '@/components/ui/badge'
 import { NovaRecorrenteDialog } from '@/components/cadastro/nova-recorrente-dialog'
+import { EditarRecorrenteDialog } from '@/components/cadastro/editar-recorrente-dialog'
 
 export default async function RecorrentesPage() {
   const [recorrentes, fornecedores] = await Promise.all([
@@ -24,6 +25,13 @@ export default async function RecorrentesPage() {
       fornecedor_id: fornecedorId, descricao: input.descricao, valor: input.valor, moeda: 'BRL',
       dia_mes: input.diaMes, data_inicio: hoje, proxima_geracao: `${hoje.slice(0, 7)}-01`,
     })
+    revalidatePath('/despesas/recorrentes')
+    revalidatePath('/')
+  }
+
+  async function editarRecorrenteAction(id: string, patch: { descricao: string; valor: number; dia_mes: number; ativa: boolean }) {
+    'use server'
+    await atualizarRecorrente(id, patch)
     revalidatePath('/despesas/recorrentes')
     revalidatePath('/')
   }
@@ -71,7 +79,10 @@ export default async function RecorrentesPage() {
                     <Badge variant={r.ativa ? 'default' : 'secondary'}>{r.ativa ? 'ativa' : 'inativa'}</Badge>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <Link href={`/despesas/recorrentes/${r.id}`} className="text-sm text-primary underline">Ver</Link>
+                    <div className="flex items-center justify-end gap-2">
+                      <EditarRecorrenteDialog initial={{ id: r.id, descricao: r.descricao, valor: r.valor, dia_mes: r.dia_mes, ativa: r.ativa }} onSalvar={editarRecorrenteAction} />
+                      <Link href={`/despesas/recorrentes/${r.id}`} className="text-sm text-primary underline">Ver</Link>
+                    </div>
                   </td>
                 </tr>
               )

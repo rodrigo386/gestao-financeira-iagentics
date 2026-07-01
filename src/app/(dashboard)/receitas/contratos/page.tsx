@@ -1,9 +1,10 @@
 import Link from 'next/link'
 import { revalidatePath } from 'next/cache'
-import { listarContratos, criarContrato } from '@/modules/receitas/contratos'
+import { listarContratos, criarContrato, atualizarContrato } from '@/modules/receitas/contratos'
 import { listarClientes, criarCliente } from '@/modules/receitas/clientes'
 import { Badge } from '@/components/ui/badge'
 import { NovoContratoDialog } from '@/components/cadastro/novo-contrato-dialog'
+import { EditarContratoDialog } from '@/components/cadastro/editar-contrato-dialog'
 
 function badgeVariant(status: string): 'default' | 'secondary' | 'destructive' {
   if (status === 'ativo') return 'default'
@@ -31,6 +32,13 @@ export default async function ContratosPage() {
       cliente_id: clienteId, nome: input.nome, tipo: 'mensal', ticket: input.ticket,
       moeda: 'BRL', dia_cobranca: input.diaCobranca, data_inicio: input.dataInicio, status: 'ativo',
     })
+    revalidatePath('/receitas/contratos')
+    revalidatePath('/')
+  }
+
+  async function editarContratoAction(id: string, patch: { nome: string; ticket: number; dia_cobranca: number; status: 'ativo' | 'pausado' | 'churned' }) {
+    'use server'
+    await atualizarContrato(id, patch)
     revalidatePath('/receitas/contratos')
     revalidatePath('/')
   }
@@ -76,7 +84,10 @@ export default async function ContratosPage() {
                   <Badge variant={badgeVariant(c.status)}>{c.status}</Badge>
                 </td>
                 <td className="px-4 py-3 text-right">
-                  <Link href={`/receitas/contratos/${c.id}`} className="text-sm text-primary underline">Ver</Link>
+                  <div className="flex items-center justify-end gap-2">
+                    <EditarContratoDialog initial={{ id: c.id, nome: c.nome, ticket: c.ticket, dia_cobranca: c.dia_cobranca, status: c.status }} onSalvar={editarContratoAction} />
+                    <Link href={`/receitas/contratos/${c.id}`} className="text-sm text-primary underline">Ver</Link>
+                  </div>
                 </td>
               </tr>
             ))}

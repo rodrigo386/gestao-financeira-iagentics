@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { criarLancamento } from '@/modules/despesas/lancamentos'
 import { BrandLogo } from '@/components/brand-logo'
 import { Button } from '@/components/ui/button'
+import { NovoLancamentoDialog } from '@/components/cadastro/novo-lancamento-dialog'
 
 const MESES_PT = [
   'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
@@ -81,14 +82,15 @@ export default async function HomePage() {
   const inicioMes = `${y}-${String(m).padStart(2, '0')}-01`
   const fimMes = new Date(Date.UTC(y, m, 0)).toISOString().slice(0, 10)
 
-  const [contas, todos, doMes, contratosRes, recorrentesRes] = await Promise.all([
-    supabase.from('contas_bancarias').select('saldo_atual').eq('ativa', true),
+  const [contas, todos, doMes, contratosRes, recorrentesRes, catsRes] = await Promise.all([
+    supabase.from('contas_bancarias').select('id, banco, saldo_atual').eq('ativa', true),
     supabase.from('lancamentos').select('valor, tipo'),
     supabase.from('lancamentos').select('valor, tipo, origem, origem_id, descricao, data')
       .gte('data', inicioMes).lte('data', fimMes).order('data', { ascending: false }),
     supabase.from('contratos').select('id, nome, ticket, dia_cobranca, cliente:clientes(nome)')
       .eq('status', 'ativo').eq('tipo', 'mensal'),
     supabase.from('despesas_recorrentes').select('id, descricao, valor, dia_mes').eq('ativa', true),
+    supabase.from('categorias').select('id, nome').eq('ativa', true).order('nome'),
   ])
 
   const temConta = (contas.data ?? []).length > 0
@@ -113,6 +115,18 @@ export default async function HomePage() {
   const aReceberPendente = contratos.filter((c) => !recebidos.has(c.id)).reduce((s, c) => s + Number(c.ticket), 0)
   const aPagarPendente = recorrentes.filter((r) => !pagos.has(r.id)).reduce((s, r) => s + Number(r.valor), 0)
 
+  const contasSelect = (contas.data ?? []).map((c) => ({ id: c.id as string, banco: c.banco as string }))
+  const cats = (catsRes.data ?? []) as { id: string; nome: string }[]
+
+  async function criarLancamentoAction(input: { tipo: 'entrada' | 'saida'; valor: number; descricao: string; contaId: string; data: string; categoriaId?: string }) {
+    'use server'
+    await criarLancamento({
+      data: input.data, valor: input.valor, conta_id: input.contaId, tipo: input.tipo,
+      descricao: input.descricao, categoria_id: input.categoriaId || undefined, origem: 'manual',
+    })
+    revalidatePath('/')
+  }
+
   return (
     <div className="space-y-6">
       {/* header */}
@@ -122,10 +136,12 @@ export default async function HomePage() {
           <h1 className="text-2xl font-semibold">Olá, {usuario?.nome ?? 'bem-vindo'}</h1>
           <p className="text-sm text-muted-foreground">Este mês · {MESES_PT[m - 1]} de {y}</p>
         </div>
-        <div className="ml-auto flex gap-2">
-          <Link href="/despesas/lancamentos/novo?tipo=entrada" className="rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:opacity-90">+ Entrada</Link>
-          <Link href="/despesas/lancamentos/novo?tipo=saida" className="rounded-md border border-border px-3 py-2 text-sm font-medium hover:bg-accent">+ Saída</Link>
-        </div>
+        {temConta && (
+          <div className="ml-auto flex gap-2">
+            <NovoLancamentoDialog tipo="entrada" contas={contasSelect} categorias={cats} onCriar={criarLancamentoAction} />
+            <NovoLancamentoDialog tipo="saida" contas={contasSelect} categorias={cats} onCriar={criarLancamentoAction} />
+          </div>
+        )}
       </div>
 
       {!temConta && (

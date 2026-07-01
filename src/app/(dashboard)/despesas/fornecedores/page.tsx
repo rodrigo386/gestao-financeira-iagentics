@@ -1,9 +1,10 @@
 import Link from 'next/link'
 import { revalidatePath } from 'next/cache'
-import { listarFornecedores, criarFornecedor } from '@/modules/despesas/fornecedores'
+import { listarFornecedores, criarFornecedor, atualizarFornecedor } from '@/modules/despesas/fornecedores'
 import { createClient } from '@/lib/supabase/server'
 import { Badge } from '@/components/ui/badge'
 import { NovoFornecedorDialog } from '@/components/cadastro/novo-fornecedor-dialog'
+import { EditarFornecedorDialog } from '@/components/cadastro/editar-fornecedor-dialog'
 
 export default async function FornecedoresPage() {
   const supabase = await createClient()
@@ -17,6 +18,12 @@ export default async function FornecedoresPage() {
   async function criarFornecedorAction(input: { nome: string; contato_email?: string }) {
     'use server'
     await criarFornecedor({ nome: input.nome, contato_email: input.contato_email })
+    revalidatePath('/despesas/fornecedores')
+  }
+
+  async function editarFornecedorAction(id: string, patch: { nome: string; contato_email?: string; ativo: boolean }) {
+    'use server'
+    await atualizarFornecedor(id, patch)
     revalidatePath('/despesas/fornecedores')
   }
 
@@ -59,7 +66,10 @@ export default async function FornecedoresPage() {
                   <Badge variant={f.ativo ? 'default' : 'secondary'}>{f.ativo ? 'ativo' : 'inativo'}</Badge>
                 </td>
                 <td className="px-4 py-3 text-right">
-                  <Link href={`/despesas/fornecedores/${f.id}`} className="text-sm text-primary underline">Ver</Link>
+                  <div className="flex items-center justify-end gap-2">
+                    <EditarFornecedorDialog initial={{ id: f.id, nome: f.nome, contato_email: f.contato_email, ativo: f.ativo }} onSalvar={editarFornecedorAction} />
+                    <Link href={`/despesas/fornecedores/${f.id}`} className="text-sm text-primary underline">Ver</Link>
+                  </div>
                 </td>
               </tr>
             ))}
