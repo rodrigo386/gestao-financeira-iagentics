@@ -12,7 +12,7 @@ export default async function ConfigPage() {
   }
 
   const itens: { href: string; titulo: string; desc: string }[] = [
-    { href: '/config/contas-bancarias', titulo: 'Contas Bancárias', desc: 'Cadastrar contas e ajustar saldo (alimenta o caixa)' },
+    { href: '/config/contas-bancarias', titulo: 'Contas Bancárias', desc: 'Cadastrar contas e o saldo inicial (o caixa soma as entradas e saídas a partir dele)' },
   ]
   if (isAdmin) {
     itens.push({ href: '/config/usuarios', titulo: 'Usuários', desc: 'Criar/gerenciar usuários (admin)' })
