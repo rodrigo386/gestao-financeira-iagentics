@@ -15,13 +15,11 @@ export function GerarMesButton({
   label,
   pendingLabel,
   onGerar,
-  formatMsg,
 }: {
   id: string
   label: string
   pendingLabel: string
   onGerar: (month: string) => Promise<GerarMesResult>
-  formatMsg: (r: GerarMesResult) => string
 }) {
   const router = useRouter()
   const [month, setMonth] = useState(mesAtual())
@@ -35,7 +33,7 @@ export function GerarMesButton({
     start(async () => {
       try {
         const r = await onGerar(month)
-        setMsg(formatMsg(r))
+        setMsg(`${r.inserted} gerada(s), ${r.skipped} já existia(m).`)
         router.refresh()
       } catch (e) {
         setErr(e instanceof Error ? e.message : 'Erro ao gerar')

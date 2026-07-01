@@ -118,7 +118,6 @@ export default async function ContasPagarPage() {
           label="Gerar contas a pagar do mês"
           pendingLabel="Gerando..."
           onGerar={gerarAPAction}
-          formatMsg={(r) => `${r.inserted} gerada(s), ${r.skipped} já existia(m).`}
         />
       </div>
 
