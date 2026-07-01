@@ -1,4 +1,5 @@
 import { revalidatePath } from 'next/cache'
+import Link from 'next/link'
 import { listarAR, gerarARMes, atualizarAR, marcarRecebido } from '@/modules/contas-receber/ar'
 import { createClient } from '@/lib/supabase/server'
 import { withAudit } from '@/lib/audit'
@@ -61,6 +62,7 @@ export default async function ContasReceberPage() {
     if (!u || !['admin', 'financeiro'].includes(u.role)) throw new Error('sem permissão para marcar recebido')
     await marcarRecebido(id, input.dataRecebimento, input.contaId, input.categoriaId, user.id)
     revalidatePath('/contas-receber')
+    revalidatePath('/')
   }
 
   const supabaseRead = await createClient()
@@ -75,6 +77,13 @@ export default async function ContasReceberPage() {
         <h1 className="text-2xl font-semibold">Contas a Receber</h1>
         <p className="text-sm text-muted-foreground">Próximos 90 dias</p>
       </div>
+
+      <div className="flex flex-wrap items-center gap-3 text-sm">
+        <span className="text-muted-foreground">Gerenciar:</span>
+        <Link href="/receitas/clientes" className="text-primary underline">Clientes</Link>
+        <Link href="/receitas/contratos" className="text-primary underline">Contratos</Link>
+      </div>
+
       <div className="rounded-lg border border-border bg-card p-4">
         <p className="mb-3 text-sm text-muted-foreground">
           Gere as AR previstas dos contratos ativos para um mês. Idempotente — não duplica AR já criadas.

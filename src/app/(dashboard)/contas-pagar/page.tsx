@@ -1,8 +1,10 @@
 import { revalidatePath } from 'next/cache'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { listarAP, aprovarAP, marcarAPPago, cancelarAP } from '@/modules/contas-pagar/ap'
+import { listarAP, aprovarAP, marcarAPPago, cancelarAP, gerarAPMes } from '@/modules/contas-pagar/ap'
 import { APRowActions } from '@/components/ap-row-actions'
+import { GerarMesButton, type GerarMesResult } from '@/components/gerar-mes-button'
+import { withAudit } from '@/lib/audit'
 import { Badge } from '@/components/ui/badge'
 
 const STATUS_VARIANT: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
@@ -55,7 +57,7 @@ export default async function ContasPagarPage() {
     const hoje = new Date().toISOString().slice(0, 10)
     await marcarAPPago(id, hoje, contaId, u.id)
     revalidatePath('/contas-pagar')
-    revalidatePath('/fluxo-caixa')
+    revalidatePath('/')
   }
 
   async function cancelar(formData: FormData) {
@@ -69,6 +71,26 @@ export default async function ContasPagarPage() {
     revalidatePath('/contas-pagar')
   }
 
+  async function gerarAPAction(month: string): Promise<GerarMesResult> {
+    'use server'
+    if (!/^\d{4}-\d{2}$/.test(month)) throw new Error('mês inválido')
+    const sb = await createClient()
+    const { data: { user: u } } = await sb.auth.getUser()
+    if (!u) throw new Error('não autenticado')
+    const { data: me } = await sb.from('usuarios').select('role').eq('id', u.id).single()
+    if (!me || !['admin', 'financeiro'].includes(me.role)) throw new Error('sem permissão para gerar contas a pagar')
+    const refMonth = `${month}-01`
+    const result = await withAudit(
+      {
+        usuario_id: u.id, acao: 'custom', tabela: 'contas_a_pagar', registro_id: refMonth,
+        before: null, after: { mes_ref: refMonth }, motivo: 'gerar AP do mês (pagar)',
+      },
+      async () => gerarAPMes(refMonth),
+    )
+    revalidatePath('/contas-pagar')
+    return result
+  }
+
   const total = rows.reduce(
     (s, r) => s + (r.status !== 'cancelado' ? r.valor : 0),
     0,
@@ -79,6 +101,25 @@ export default async function ContasPagarPage() {
       <div>
         <h1 className="text-2xl font-semibold">Contas a Pagar</h1>
         <p className="text-sm text-muted-foreground">Últimos 30 dias + próximos 60 dias</p>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-3 text-sm">
+        <span className="text-muted-foreground">Gerenciar:</span>
+        <Link href="/despesas/fornecedores" className="text-primary underline">Fornecedores</Link>
+        <Link href="/despesas/recorrentes" className="text-primary underline">Despesas recorrentes</Link>
+      </div>
+
+      <div className="rounded-lg border border-border bg-card p-4">
+        <p className="mb-3 text-sm text-muted-foreground">
+          Gere as contas a pagar das despesas recorrentes para um mês. Idempotente — não duplica.
+        </p>
+        <GerarMesButton
+          id="pagar-ap"
+          label="Gerar contas a pagar do mês"
+          pendingLabel="Gerando..."
+          onGerar={gerarAPAction}
+          formatMsg={(r) => `${r.inserted} gerada(s), ${r.skipped} já existia(m).`}
+        />
       </div>
 
       {contas.length === 0 && (

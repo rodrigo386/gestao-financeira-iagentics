@@ -2,17 +2,13 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { buscarCliente } from '@/modules/receitas/clientes'
 import { listarContratos } from '@/modules/receitas/contratos'
-import { listarProjetos } from '@/modules/receitas/projetos'
 import { Badge } from '@/components/ui/badge'
 
 export default async function ClienteDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const cliente = await buscarCliente(id)
   if (!cliente) notFound()
-  const [contratos, projetos] = await Promise.all([
-    listarContratos({ cliente_id: id }),
-    listarProjetos({ cliente_id: id }),
-  ])
+  const contratos = await listarContratos({ cliente_id: id })
 
   return (
     <div className="space-y-8">
@@ -51,30 +47,6 @@ export default async function ClienteDetailPage({ params }: { params: Promise<{ 
                     <div className="text-xs text-muted-foreground">{c.tipo} · R$ {c.ticket} · desde {c.data_inicio}</div>
                   </div>
                   <Badge variant={c.status === 'ativo' ? 'default' : 'secondary'}>{c.status}</Badge>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
-      <section>
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-medium">Projetos ({projetos.length})</h2>
-          <Link href={`/receitas/projetos/novo?cliente=${id}`} className="text-sm text-primary underline">+ Novo projeto</Link>
-        </div>
-        {projetos.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Sem projetos.</p>
-        ) : (
-          <ul className="space-y-2">
-            {projetos.map((p) => (
-              <li key={p.id} className="border rounded-md p-3">
-                <div className="flex justify-between">
-                  <div>
-                    <Link href={`/receitas/projetos/${p.id}`} className="font-medium text-primary underline">{p.nome}</Link>
-                    <div className="text-xs text-muted-foreground">R$ {p.valor_total} · {p.data_inicio} → {p.data_prevista_fim}</div>
-                  </div>
-                  <Badge variant={p.status === 'ativo' ? 'default' : 'secondary'}>{p.status}</Badge>
                 </div>
               </li>
             ))}

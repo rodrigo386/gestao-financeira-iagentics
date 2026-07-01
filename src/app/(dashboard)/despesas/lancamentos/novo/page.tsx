@@ -5,7 +5,10 @@ import { listarClientes } from '@/modules/receitas/clientes'
 import { createClient } from '@/lib/supabase/server'
 import { LancamentoForm } from '@/components/forms/lancamento-form'
 
-export default async function NovoLancamentoPage() {
+export default async function NovoLancamentoPage({ searchParams }: { searchParams: Promise<{ tipo?: string }> }) {
+  const { tipo } = await searchParams
+  const tipoInicial: 'entrada' | 'saida' | undefined =
+    tipo === 'entrada' ? 'entrada' : tipo === 'saida' ? 'saida' : undefined
   const supabase = await createClient()
 
   const [fornecedores, { data: clientes }, { data: contas }, { data: categorias }] = await Promise.all([
@@ -39,13 +42,14 @@ export default async function NovoLancamentoPage() {
       origem: 'manual' as const,
     }
     await criarLancamento(cleaned)
-    redirect('/despesas/lancamentos')
+    redirect('/')
   }
 
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold">Novo lançamento</h1>
       <LancamentoForm
+        initialData={tipoInicial ? { tipo: tipoInicial } : undefined}
         onSubmit={action}
         submitLabel="Criar lançamento"
         contas={contas ?? []}
