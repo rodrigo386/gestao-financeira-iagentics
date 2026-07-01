@@ -1,8 +1,9 @@
 import Link from 'next/link'
-import { listarContratos } from '@/modules/receitas/contratos'
-import { listarClientes } from '@/modules/receitas/clientes'
-import { Button } from '@/components/ui/button'
+import { revalidatePath } from 'next/cache'
+import { listarContratos, criarContrato } from '@/modules/receitas/contratos'
+import { listarClientes, criarCliente } from '@/modules/receitas/clientes'
 import { Badge } from '@/components/ui/badge'
+import { NovoContratoDialog } from '@/components/cadastro/novo-contrato-dialog'
 
 function badgeVariant(status: string): 'default' | 'secondary' | 'destructive' {
   if (status === 'ativo') return 'default'
@@ -18,6 +19,22 @@ export default async function ContratosPage() {
 
   const clienteMap = new Map(clientes.map((c) => [c.id, c.nome]))
 
+  async function criarContratoAction(input: { clienteId?: string; novoClienteNome?: string; nome: string; ticket: number; diaCobranca: number; dataInicio: string }) {
+    'use server'
+    let clienteId = input.clienteId
+    if (!clienteId && input.novoClienteNome) {
+      const c = await criarCliente({ nome: input.novoClienteNome, moeda_padrao: 'BRL' })
+      clienteId = c.id
+    }
+    if (!clienteId) throw new Error('Selecione ou crie um cliente')
+    await criarContrato({
+      cliente_id: clienteId, nome: input.nome, tipo: 'mensal', ticket: input.ticket,
+      moeda: 'BRL', dia_cobranca: input.diaCobranca, data_inicio: input.dataInicio, status: 'ativo',
+    })
+    revalidatePath('/receitas/contratos')
+    revalidatePath('/')
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -25,9 +42,7 @@ export default async function ContratosPage() {
           <h1 className="text-2xl font-semibold">Contratos</h1>
           <p className="text-sm text-muted-foreground">{contratos.length} contrato(s) cadastrados</p>
         </div>
-        <Link href="/receitas/contratos/novo">
-          <Button>Novo contrato</Button>
-        </Link>
+        <NovoContratoDialog clientes={clientes.map((c) => ({ id: c.id, nome: c.nome }))} onCriar={criarContratoAction} />
       </div>
 
       <div className="border rounded-md">

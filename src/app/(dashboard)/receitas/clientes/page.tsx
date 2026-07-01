@@ -1,10 +1,17 @@
 import Link from 'next/link'
-import { listarClientes } from '@/modules/receitas/clientes'
-import { Button } from '@/components/ui/button'
+import { revalidatePath } from 'next/cache'
+import { listarClientes, criarCliente } from '@/modules/receitas/clientes'
 import { Badge } from '@/components/ui/badge'
+import { NovoClienteDialog } from '@/components/cadastro/novo-cliente-dialog'
 
 export default async function ClientesPage() {
   const { data, total } = await listarClientes({ limit: 100 })
+
+  async function criarClienteAction(input: { nome: string; contato_email?: string }) {
+    'use server'
+    await criarCliente({ nome: input.nome, contato_email: input.contato_email, moeda_padrao: 'BRL' })
+    revalidatePath('/receitas/clientes')
+  }
 
   return (
     <div className="space-y-6">
@@ -13,9 +20,7 @@ export default async function ClientesPage() {
           <h1 className="text-2xl font-semibold">Clientes</h1>
           <p className="text-sm text-muted-foreground">{total} cliente(s) cadastrados</p>
         </div>
-        <Link href="/receitas/clientes/novo">
-          <Button>Novo cliente</Button>
-        </Link>
+        <NovoClienteDialog onCriar={criarClienteAction} />
       </div>
 
       <div className="border rounded-md">

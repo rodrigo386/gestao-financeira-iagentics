@@ -1,8 +1,9 @@
 import Link from 'next/link'
-import { listarFornecedores } from '@/modules/despesas/fornecedores'
+import { revalidatePath } from 'next/cache'
+import { listarFornecedores, criarFornecedor } from '@/modules/despesas/fornecedores'
 import { createClient } from '@/lib/supabase/server'
-import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { NovoFornecedorDialog } from '@/components/cadastro/novo-fornecedor-dialog'
 
 export default async function FornecedoresPage() {
   const supabase = await createClient()
@@ -13,6 +14,12 @@ export default async function FornecedoresPage() {
 
   const categoriaMap = new Map((categorias ?? []).map((c: { id: string; nome: string }) => [c.id, c.nome]))
 
+  async function criarFornecedorAction(input: { nome: string; contato_email?: string }) {
+    'use server'
+    await criarFornecedor({ nome: input.nome, contato_email: input.contato_email })
+    revalidatePath('/despesas/fornecedores')
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -20,9 +27,7 @@ export default async function FornecedoresPage() {
           <h1 className="text-2xl font-semibold">Fornecedores</h1>
           <p className="text-sm text-muted-foreground">{fornecedores.length} fornecedor(es) cadastrados</p>
         </div>
-        <Link href="/despesas/fornecedores/novo">
-          <Button>Novo fornecedor</Button>
-        </Link>
+        <NovoFornecedorDialog onCriar={criarFornecedorAction} />
       </div>
 
       <div className="border rounded-md">
